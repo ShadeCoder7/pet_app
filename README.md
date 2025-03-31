@@ -51,4 +51,4 @@ Welcome to the **Animal Adoption Mobile App**! 🎉 This project is designed to 
 ## Contact 📨
 
 - **Author:** Eric Moya Carmona
-- **Email:** [eric.moya@email.com](mailto:eric.moya@email.com)
+- **Email:** [ericmoyacarmona7@gmail.com](mailto:ericmoyacarmona7@gmail.com)
