@@ -1,0 +1,31 @@
+
+services:
+  db:
+    image: postgres:${POSTGRES_VERSION:-latest}
+    container_name: ${POSTGRES_CONTAINER_NAME:-postgres_db}
+    restart: ${RESTART_POLICY:-always}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ${POSTGRES_VOLUME_NAME:-postgres_data}:/var/lib/postgresql/data 
+      - ${SQL_INIT_PATH:-./sql/init_db.sql}:/docker-entrypoint-initdb.d/init_db.sql
+
+
+  pgadmin:
+    image: dpage/pgadmin4:${PGADMIN_VERSION:-latest}
+    container_name: ${PGADMIN_CONTAINER_NAME:-pgadmin}
+    restart: ${RESTART_POLICY:-always}
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "${PGADMIN_PORT}:80"
+    depends_on:
+      - db
+
+volumes:
+  ${POSTGRES_VOLUME_NAME:-postgres_data}:
