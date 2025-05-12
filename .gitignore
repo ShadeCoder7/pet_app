@@ -1,0 +1,51 @@
+# Ignore .env files
+.env
+
+# Ignore IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore build and output directories
+bin/
+obj/
+build/
+Debug/
+Release/
+
+# Ignore Docker files
+*.dockerfile
+docker-compose.override.yml
+
+# Ignore Flutter specific files
+**/ios/
+**/android/
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+
+# Ignore ASP.NET Core specific files
+**/Migrations/
+**/wwwroot/
+**/appsettings.*.json
+
+# Ignore log files
+*.log
+
+# Ignore local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore node modules
+node_modules/
+
+# Ignore macOS specific files
+.DS_Store
+
+# Ignore Windows specific files
+Thumbs.db
