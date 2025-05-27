@@ -1,0 +1,15 @@
+// DTO used to register/create a new user (handled by backend after Firebase Auth).
+public class UserCreateDto
+{
+    public string UserEmail { get; set; }
+    public string UserRole { get; set; }
+    public bool IsRoleVerified { get; set; }
+    public string UserFirstName { get; set; }
+    public string UserLastName { get; set; }
+    public string UserPhoneNumber { get; set; }
+    public string UserAddress { get; set; }
+    public DateTime UserBirthDate { get; set; }
+    public string UserProfilePicture { get; set; }
+    public bool UserIsVerified { get; set; }
+    // Do NOT include CreateUserDate or UserId (handled by backend)
+}

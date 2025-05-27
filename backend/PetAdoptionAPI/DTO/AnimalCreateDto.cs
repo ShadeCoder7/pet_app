@@ -1,4 +1,5 @@
 // DTO used when creating a new animal (POST request).
+// DTO used when creating a new animal (POST request).
 public class AnimalCreateDto
 {
     // Name of the animal.

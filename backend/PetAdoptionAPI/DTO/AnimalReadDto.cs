@@ -24,5 +24,5 @@ public class AnimalReadDto
     // Date when the entry was last updated.
     public DateTime AdUpdateDate { get; set; }
     // List of associated images (using DTO for images).
-    public List<AnimalImageReadDTO> Images { get; set; }
+    public List<AnimalImageReadDto> Images { get; set; }
 }
