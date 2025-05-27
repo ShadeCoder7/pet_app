@@ -16,9 +16,6 @@ namespace PetAdoptionAPI.Models
         public string UserEmail { get; set; }  // Email del usuario
 
         [Required]
-        public string UserPassword { get; set; }  // Contraseña cifrada
-
-        [Required]
         [StringLength(20)]
         public string UserRole { get; set; }  // Rol del usuario
 
