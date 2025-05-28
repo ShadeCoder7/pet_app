@@ -21,5 +21,4 @@ public class ReportUpdateDto
     public string AnimalSizeKey { get; set; }
     // Optionally, allow admin to update verification status
     public bool? ReportIsVerified { get; set; }
-    // Do NOT include ReportId, ReportDate, or ReportUpdateDate (handled by backend).
 }

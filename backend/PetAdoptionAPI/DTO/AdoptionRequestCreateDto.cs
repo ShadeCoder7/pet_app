@@ -7,5 +7,4 @@ public class AdoptionRequestCreateDto
     public Guid UserId { get; set; }
     // AnimalId of the animal being requested for adoption.
     public Guid AnimalId { get; set; }
-    // Do NOT include status, response, dates, verification, or completion (handled by backend).
 }

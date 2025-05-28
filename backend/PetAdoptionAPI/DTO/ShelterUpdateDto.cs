@@ -10,5 +10,4 @@ public class ShelterUpdateDto
     public Guid? UserId { get; set; }
     // Allow admin to update verification status if needed.
     public bool? ShelterIsVerified { get; set; }
-    // Do NOT include current capacity, occupancy, or dates (handled by backend).
 }

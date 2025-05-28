@@ -30,5 +30,4 @@ public class AnimalCreateDto
     public Guid? ShelterId { get; set; }
     // (Optional) ID of the associated foster home.
     public Guid? FosterHomeId { get; set; }
-    // You can add a list of image URLs or IDs if needed.
 }

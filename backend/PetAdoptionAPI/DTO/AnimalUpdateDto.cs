@@ -15,5 +15,4 @@ public class AnimalUpdateDto
     public Guid? UserId { get; set; }
     public Guid? ShelterId { get; set; }
     public Guid? FosterHomeId { get; set; }
-    // Only include fields that are allowed to be updated.
 }

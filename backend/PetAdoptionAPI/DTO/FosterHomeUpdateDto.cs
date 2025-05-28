@@ -10,5 +10,4 @@ public class FosterHomeUpdateDto
     public Guid? UserId { get; set; }
     // Allow updating verification status by admin if needed.
     public bool? FosterHomeIsVerified { get; set; }
-    // Do NOT include dates or occupancy (handled by backend).
 }

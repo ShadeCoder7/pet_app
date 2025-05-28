@@ -34,5 +34,4 @@ public class ReportCreateDto
     public Guid? UserId { get; set; }
     public string AnimalTypeKey { get; set; }
     public string AnimalSizeKey { get; set; }
-    // Do NOT include ReportId, ReportDate, ReportUpdateDate, or ReportIsVerified.
 }

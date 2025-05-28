@@ -15,6 +15,5 @@ public class FosterHomeCreateDto
     public string FosterHomePhoneNumber { get; set; }
     // (Optional) UserId for the owner or manager.
     public Guid? UserId { get; set; }
-    // Do NOT include FosterHomeIsVerified, dates, or occupancy info here.
 }
 

@@ -15,5 +15,4 @@ public class ShelterCreateDto
     public string ShelterPhoneNumber { get; set; }
     // (Optional) UserId for the manager or responsible user.
     public Guid? UserId { get; set; }
-    // Do NOT include current capacity, occupancy, dates, or verification in CreateDto.
 }
