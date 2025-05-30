@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // For authorization attributes
 using System;
 using System.Threading.Tasks;
 using PetAdoptionAPI.Interfaces;   // For IFosterHomeService
@@ -6,6 +7,7 @@ using PetAdoptionAPI.Dtos;         // For DTOs
 
 namespace PetAdoptionAPI.Controllers
 {
+    [Authorize] // Ensures that only authenticated users can access this controller
     [ApiController] // Marks this class as an API Controller
     [Route("api/[controller]")] // Base route will be api/fosterhome
     public class FosterHomeController : ControllerBase
@@ -22,6 +24,7 @@ namespace PetAdoptionAPI.Controllers
         /// <summary>
         /// Retrieves a list of all foster homes.
         /// </summary>
+        [AllowAnonymous] // Allows anonymous access to this endpoint
         [HttpGet]
         public async Task<IActionResult> GetAllFosterHomes()
         {
@@ -33,6 +36,7 @@ namespace PetAdoptionAPI.Controllers
         /// <summary>
         /// Retrieves a specific foster home by its unique ID.
         /// </summary>
+        [AllowAnonymous] // Allows anonymous access to this endpoint
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFosterHomeById(Guid id)
         {
@@ -48,6 +52,7 @@ namespace PetAdoptionAPI.Controllers
         /// </summary>
         /// <param name="name">The partial or full name to search for.</param>
         /// <returns>A list of foster homes matching the name.</returns>
+        [AllowAnonymous] // Allows anonymous access to this endpoint
         [HttpGet("search")]
         public async Task<IActionResult> GetFosterHomesByName([FromQuery] string name)
         {
