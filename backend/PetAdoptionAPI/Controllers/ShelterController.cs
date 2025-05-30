@@ -46,6 +46,20 @@ namespace PetAdoptionAPI.Controllers
             return Ok(shelter);
         }
 
+        // GET: api/shelter/search?name={name}
+        /// <summary>
+        /// Retrieves a list of shelters whose name contains the specified value (case-insensitive).
+        /// </summary>
+        /// <param name="name">The partial or full name to search for.</param>
+        /// <returns>A list of shelters matching the name.</returns>
+        [AllowAnonymous]
+        [HttpGet("search")]
+        public async Task<IActionResult> GetSheltersByName([FromQuery] string name)
+        {
+            var shelters = await _shelterService.GetSheltersByNameAsync(name);
+            return Ok(shelters); // Returns 200 OK with the matching shelters
+        }
+
         // POST: api/shelter
         /// <summary>
         /// Creates a new shelter.

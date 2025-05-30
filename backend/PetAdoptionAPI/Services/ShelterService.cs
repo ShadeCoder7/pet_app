@@ -68,6 +68,35 @@ namespace PetAdoptionAPI.Services
             };
         }
 
+        // Get shelters by name
+        public async Task<List<ShelterReadDto>> GetSheltersByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return new List<ShelterReadDto>();
+
+            // Búsqueda insensible a mayúsculas/minúsculas en PostgreSQL
+            var shelters = await _context.Shelters
+                .Where(s => EF.Functions.ILike(s.ShelterName, $"%{name}%"))
+                .ToListAsync();
+
+            return shelters.Select(s => new ShelterReadDto
+            {
+                ShelterId = s.ShelterId,
+                ShelterName = s.ShelterName,
+                ShelterAddress = s.ShelterAddress,
+                ShelterDescription = s.ShelterDescription,
+                ShelterCapacity = s.ShelterCapacity,
+                ShelterCurrentCapacity = s.ShelterCurrentCapacity,
+                ShelterCurrentOccupancy = s.ShelterCurrentOccupancy,
+                ShelterWebsite = s.ShelterWebsite,
+                ShelterPhoneNumber = s.ShelterPhoneNumber,
+                ShelterCreateDate = s.ShelterCreateDate,
+                ShelterUpdateDate = s.ShelterUpdateDate,
+                ShelterIsVerified = s.ShelterIsVerified,
+                UserId = s.UserId
+            }).ToList();
+        }
+
         // Create a new shelter
         public async Task<ShelterReadDto> CreateShelterAsync(ShelterCreateDto dto)
         {
