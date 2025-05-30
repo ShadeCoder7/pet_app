@@ -25,8 +25,8 @@ namespace PetAdoptionAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllFosterHomes()
         {
-            var reports = await _fosterhomeService.GetAllFosterHomesAsync();
-            return Ok(reports); // Returns 200 OK with the list of users
+            var fosterhomes = await _fosterhomeService.GetAllFosterHomesAsync();
+            return Ok(fosterhomes); // Returns 200 OK with the list of users
         }
 
         // GET: api/fosterhome/{id}
