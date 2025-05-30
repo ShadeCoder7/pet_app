@@ -76,20 +76,23 @@ namespace PetAdoptionAPI.Controllers
 
         // PATCH: api/user/{id}
         /// <summary>
-        /// Actualiza parcialmente los datos de un usuario por su ID.
+        /// Partially updates user data by their ID.
         /// </summary>
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchUser(Guid id, [FromBody] UserUpdateDto dto)
         {
+            // Check if the request model is valid
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState); // Returns 400 Bad Request if the model is invalid
 
+            // Try to update the user with the given ID using the provided data
             var success = await _userService.UpdateUserAsync(id, dto);
             if (!success)
-                return NotFound();
+                return NotFound(); // Returns 404 if the user does not exist
 
-            return NoContent(); // 204
+            return NoContent(); // Returns 204 No Content on success
         }
+
 
         // DELETE: api/user/{id}
         /// <summary>
