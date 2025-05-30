@@ -115,4 +115,6 @@ This API provides an interface to manage users, animals, adoption requests, shel
 - `POST` and `PUT` methods expect DTOs (Data Transfer Objects) as the request body.
 - IDs are usually in UUID format (`Guid` in C#).
 
+> Currently, the API does not enforce unique constraints on user email, phone number, or other fields. This means that duplicate entries can be created as long as the userId is different. For a production-ready version, it is recommended to implement proper validations to prevent duplicate users.
+
 ---
