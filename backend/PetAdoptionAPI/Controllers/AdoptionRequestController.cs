@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // For authorization attributes
 using System;
 using System.Threading.Tasks;
 using PetAdoptionAPI.Interfaces;   // For IAdoptionRequestService
@@ -6,6 +7,7 @@ using PetAdoptionAPI.Dtos;         // For DTOs
 
 namespace PetAdoptionAPI.Controllers
 {
+    [Authorize] // Ensures that only authenticated users can access this controller
     [ApiController] // Marks this class as an API Controller
     [Route("api/[controller]")] // Base route will be api/adoptionrequest
     public class AdoptionRequestController : ControllerBase
