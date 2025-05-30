@@ -20,7 +20,7 @@ namespace PetAdoptionAPI.Services
         }
 
         // Get all animal images
-        public async Task<List<AnimalImageReadDto>> GetAllImagesAsync()
+        public async Task<List<AnimalImageReadDto>> GetAllAnimalImagesAsync()
         {
             var images = await _context.AnimalImages.ToListAsync();
             return images.Select(MapToReadDto).ToList();
@@ -35,15 +35,15 @@ namespace PetAdoptionAPI.Services
             return images.Select(MapToReadDto).ToList();
         }
 
-        // Get a single image by its ID
-        public async Task<AnimalImageReadDto> GetImageByIdAsync(int animalImageId)
+        // Get a single animal image by its ID
+        public async Task<AnimalImageReadDto> GetAnimalImageByIdAsync(int animalImageId)
         {
             var image = await _context.AnimalImages.FindAsync(animalImageId);
             return image == null ? null : MapToReadDto(image);
         }
 
         // Create a new animal image
-        public async Task<AnimalImageReadDto> CreateImageAsync(AnimalImageCreateDto dto)
+        public async Task<AnimalImageReadDto> CreateAnimalImageAsync(AnimalImageCreateDto dto)
         {
             var image = new AnimalImage
             {
@@ -63,7 +63,7 @@ namespace PetAdoptionAPI.Services
         }
 
         // Update an existing animal image
-        public async Task<bool> UpdateImageAsync(int animalImageId, AnimalImageUpdateDto dto)
+        public async Task<bool> UpdateAnimalImageAsync(int animalImageId, AnimalImageUpdateDto dto)
         {
             var image = await _context.AnimalImages.FindAsync(animalImageId);
             if (image == null) return false;
@@ -80,7 +80,7 @@ namespace PetAdoptionAPI.Services
         }
 
         // Delete an animal image
-        public async Task<bool> DeleteImageAsync(int animalImageId)
+        public async Task<bool> DeleteAnimalImageAsync(int animalImageId)
         {
             var image = await _context.AnimalImages.FindAsync(animalImageId);
             if (image == null) return false;
