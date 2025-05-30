@@ -126,6 +126,28 @@ namespace PetAdoptionAPI.Services
             return true;
         }
 
+        // Partial user updates (PATCH)
+        public async Task<bool> PatchUserAsync(Guid userId, UserPatchDto dto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Only update fields that are provided (not null)
+            if (dto.UserFirstName != null) user.UserFirstName = dto.UserFirstName;
+            if (dto.UserLastName != null) user.UserLastName = dto.UserLastName;
+            if (dto.UserPhoneNumber != null) user.UserPhoneNumber = dto.UserPhoneNumber;
+            if (dto.UserAddress != null) user.UserAddress = dto.UserAddress;
+            if (dto.UserBirthDate.HasValue) user.UserBirthDate = dto.UserBirthDate.Value;
+            if (dto.UserProfilePicture != null) user.UserProfilePicture = dto.UserProfilePicture;
+            if (dto.UserRole != null) user.UserRole = dto.UserRole;
+            if (dto.IsRoleVerified.HasValue) user.IsRoleVerified = dto.IsRoleVerified.Value;
+            if (dto.UserIsVerified.HasValue) user.UserIsVerified = dto.UserIsVerified.Value;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
         // Delete a user
         public async Task<bool> DeleteUserAsync(Guid userId)
         {

@@ -11,6 +11,7 @@ namespace PetAdoptionAPI.Interfaces
         Task<UserReadDto> GetUserByIdAsync(Guid userId);
         Task<UserReadDto> CreateUserAsync(UserCreateDto userCreateDto);
         Task<bool> UpdateUserAsync(Guid userId, UserUpdateDto userUpdateDto);
+        Task<bool> PatchUserAsync(Guid userId, UserPatchDto userPatchDto);
         Task<bool> DeleteUserAsync(Guid userId);
     }
 }
