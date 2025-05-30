@@ -23,19 +23,19 @@ EXECUTE FUNCTION update_modified_column();
 CREATE OR REPLACE FUNCTION update_shelter_capacity()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Validar que no se exceda la capacidad máxima
+  -- Validate that the occupancy does not exceed the maximum capacity
   IF NEW.shelter_current_occupancy > NEW.shelter_capacity THEN
-    RAISE EXCEPTION 'La ocupación no puede superar la capacidad máxima';
+    RAISE EXCEPTION 'Occupancy cannot exceed maximum capacity';
   END IF;
 
-  -- Actualizar la capacidad actual
+  -- Update the current capacity
   NEW.shelter_current_capacity = NEW.shelter_capacity - NEW.shelter_current_occupancy;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 -- ==========================
--- Trigger attached to 'shelters' table to invoke update function before any UPDATE
+-- Trigger attached to 'shelters' table to invoke the capacity function before any INSERT or UPDATE
 -- ==========================
 CREATE TRIGGER update_shelter_capacity_trigger
 BEFORE INSERT OR UPDATE ON shelters
@@ -70,7 +70,7 @@ BEGIN
   -- Check if the animal is assigned to a foster home
   IF NEW.foster_home_id IS NOT NULL THEN
 
-    -- Verify if the foster home has enough capacity to accommodate the new animal
+    -- On INSERT, ensure the foster home is not at full capacity
     IF TG_OP = 'INSERT' THEN
       -- Check if the foster home has reached its maximum capacity
       IF (SELECT foster_home_current_occupancy FROM foster_homes WHERE foster_home_id = NEW.foster_home_id) >=
@@ -85,7 +85,7 @@ BEGIN
       WHERE foster_home_id = NEW.foster_home_id;
     END IF;
 
-    -- Update the occupancy of the foster home when an animal is removed
+    -- On DELETE, decrement the occupancy
     IF TG_OP = 'DELETE' THEN
       UPDATE foster_homes
       SET foster_home_current_occupancy = foster_home_current_occupancy - 1
@@ -98,7 +98,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ==========================
--- Trigger attached to 'animals' table to invoke update function after INSERT or DELETE operations
+-- Trigger attached to 'animals' table to invoke foster home occupancy update after INSERT or DELETE operations
 -- ==========================
 CREATE TRIGGER update_foster_home_occupancy_trigger
 AFTER INSERT OR DELETE ON animals
@@ -124,7 +124,9 @@ BEFORE UPDATE ON reports
 FOR EACH ROW
 EXECUTE FUNCTION update_report_modified_column();
 
--- Trigger function
+-- ==========================
+-- Trigger function to update 'request_update_date' automatically
+-- ==========================
 CREATE OR REPLACE FUNCTION update_adoption_request_modified_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -133,7 +135,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Attach the trigger to the table
+-- ==========================
+-- Trigger attached to 'adoption_requests' table to invoke update function before any UPDATE
+-- ==========================
 CREATE TRIGGER update_adoption_requests_timestamp
 BEFORE UPDATE ON adoption_requests
 FOR EACH ROW
