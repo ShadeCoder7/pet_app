@@ -1,38 +1,92 @@
-// pet_app/backend/PetAdoptionAPI/Controllers/AnimalsController.cs
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PetAdoptionAPI.Data;
-using PetAdoptionAPI.Models;
+using System;
+using System.Threading.Tasks;
+using PetAdoptionAPI.Interfaces;   // For IAnimalService
+using PetAdoptionAPI.Dtos;         // For DTOs
 
 namespace PetAdoptionAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AnimalsController : ControllerBase
+    [ApiController] // Marks this class as an API Controller (automatic model validation, etc.)
+    [Route("api/[controller]")] // Defines the route for this controller
+    public class AnimalController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IAnimalService _animalService;
 
-        public AnimalsController(ApplicationDbContext context)
+        // Constructor with dependency injection of the service
+        public AnimalController(IAnimalService animalService)
         {
-            _context = context;
+            _animalService = animalService;
         }
 
-        // GET: api/Animals
+        // GET: api/animal
+        /// <summary>
+        /// Retrieves a list of all animals.
+        /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Animal>>> GetAnimals()
+        public async Task<IActionResult> GetAllAnimals()
         {
-            return await _context.Animals.ToListAsync();
+            var animals = await _animalService.GetAllAnimalsAsync();
+            return Ok(animals); // Returns 200 OK with the list of animals
         }
 
-        // POST: api/Animals
-        [HttpPost]
-        public async Task<ActionResult<Animal>> PostAnimal(Animal animal)
+        // GET: api/animal/{id}
+        /// <summary>
+        /// Retrieves a specific animal by its unique ID.
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAnimalById(Guid id)
         {
-            _context.Animals.Add(animal);
-            await _context.SaveChangesAsync();
+            var animal = await _animalService.GetAnimalByIdAsync(id);
+            if (animal == null)
+                return NotFound(); // Returns 404 if the animal does not exist
+            return Ok(animal);
+        }
 
-            return CreatedAtAction("GetAnimal", new { id = animal.AnimalId }, animal);
+        // POST: api/animal
+        /// <summary>
+        /// Creates a new animal entry.
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> CreateAnimal([FromBody] AnimalCreateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState); // Returns 400 if the model is invalid
+
+            var createdAnimal = await _animalService.CreateAnimalAsync(dto);
+            // Returns 201 Created with the URI of the new resource
+            return CreatedAtAction(nameof(GetAnimalById), new { id = createdAnimal.AnimalId }, createdAnimal);
+        }
+
+        // PUT: api/animal/{id}
+        /// <summary>
+        /// Updates the details of an existing animal by ID.
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAnimal(Guid id, [FromBody] AnimalUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState); // Returns 400 if the model is invalid
+
+            var success = await _animalService.UpdateAnimalAsync(id, dto);
+            if (!success)
+                return NotFound(); // Returns 404 if the animal does not exist
+
+            return NoContent(); // Returns 204 No Content on success
+        }
+
+        // DELETE: api/animal/{id}
+        /// <summary>
+        /// Deletes an animal by its ID.
+        /// </summary>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAnimal(Guid id)
+        {
+            var success = await _animalService.DeleteAnimalAsync(id);
+            if (!success)
+                return NotFound(); // Returns 404 if the animal does not exist
+
+            return NoContent(); // Returns 204 No Content on successful deletion
         }
     }
 }
+
