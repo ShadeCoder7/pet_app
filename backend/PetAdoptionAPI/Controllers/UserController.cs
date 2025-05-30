@@ -74,6 +74,23 @@ namespace PetAdoptionAPI.Controllers
             return NoContent(); // Returns 204 No Content on success
         }
 
+        // PATCH: api/user/{id}
+        /// <summary>
+        /// Actualiza parcialmente los datos de un usuario por su ID.
+        /// </summary>
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchUser(Guid id, [FromBody] UserUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var success = await _userService.UpdateUserAsync(id, dto);
+            if (!success)
+                return NotFound();
+
+            return NoContent(); // 204
+        }
+
         // DELETE: api/user/{id}
         /// <summary>
         /// Deletes a user by their ID.
