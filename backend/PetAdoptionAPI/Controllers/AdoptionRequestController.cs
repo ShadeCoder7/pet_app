@@ -1,21 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using PetAdoptionAPI.Interfaces;   // For IUserService
+using PetAdoptionAPI.Interfaces;   // For IAdoptionRequestService
 using PetAdoptionAPI.Dtos;         // For DTOs
 
 namespace PetAdoptionAPI.Controllers
 {
     [ApiController] // Marks this class as an API Controller
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] // Base route will be api/adoptionrequest
     public class AdoptionRequestController : ControllerBase
     {
-        private readonly IAdoptionRequestService _adoptionrequestService;
+        private readonly IAdoptionRequestService _adoptionRequestService;
 
         // Constructor with dependency injection of the service
-        public AdoptionRequestController(IAdoptionRequestService adoptionrequestService)
+        public AdoptionRequestController(IAdoptionRequestService adoptionRequestService)
         {
-            _adoptionrequestService = adoptionrequestService;
+            _adoptionRequestService = adoptionRequestService;
         }
 
         // GET: api/adoptionrequest
@@ -23,23 +23,45 @@ namespace PetAdoptionAPI.Controllers
         /// Retrieves a list of all adoption requests.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAllAdoptionRequest()
+        public async Task<IActionResult> GetAllAdoptionRequests()
         {
-            var adoptionrequests = await _adoptionrequestService.GetAllAdoptionRequestsAsync();
-            return Ok(adoptionrequests); // Returns 200 OK with the list of users
+            var requests = await _adoptionRequestService.GetAllAdoptionRequestsAsync();
+            return Ok(requests); // Returns 200 OK with the list of adoption requests
         }
 
         // GET: api/adoptionrequest/{id}
         /// <summary>
-        /// Retrieves a specific adoption request by their unique ID.
+        /// Retrieves a specific adoption request by its unique ID.
         /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAdoptionRequestById(Guid id)
         {
-            var adoptionrequest = await _adoptionrequestService.GetAdoptionRequestByIdAsync(id);
-            if (adoptionrequest == null)
-                return NotFound(); // Returns 404 if the user does not exist
-            return Ok(adoptionrequest);
+            var request = await _adoptionRequestService.GetAdoptionRequestByIdAsync(id);
+            if (request == null)
+                return NotFound(); // Returns 404 if the request does not exist
+            return Ok(request);
+        }
+
+        // GET: api/adoptionrequest/user/{userId}
+        /// <summary>
+        /// Retrieves all adoption requests made by a specific user.
+        /// </summary>
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetAdoptionRequestsByUserId(Guid userId)
+        {
+            var requests = await _adoptionRequestService.GetAdoptionRequestsByUserIdAsync(userId);
+            return Ok(requests); // Returns 200 OK with the list of requests for the user
+        }
+
+        // GET: api/adoptionrequest/animal/{animalId}
+        /// <summary>
+        /// Retrieves all adoption requests for a specific animal.
+        /// </summary>
+        [HttpGet("animal/{animalId}")]
+        public async Task<IActionResult> GetAdoptionRequestsByAnimalId(Guid animalId)
+        {
+            var requests = await _adoptionRequestService.GetAdoptionRequestsByAnimalIdAsync(animalId);
+            return Ok(requests); // Returns 200 OK with the list of requests for the animal
         }
 
         // POST: api/adoptionrequest
@@ -52,9 +74,9 @@ namespace PetAdoptionAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState); // Returns 400 if the model is invalid
 
-            var createdAdoptionRequest = await _adoptionrequestService.CreateAdoptionRequestAsync(dto);
+            var createdRequest = await _adoptionRequestService.CreateAdoptionRequestAsync(dto);
             // Returns 201 Created with the URI of the new resource
-            return CreatedAtAction(nameof(GetAdoptionRequestById), new { id = createdAdoptionRequest.AdoptionRequestId }, createdAdoptionRequest);
+            return CreatedAtAction(nameof(GetAdoptionRequestById), new { id = createdRequest.AdoptionRequestId }, createdRequest);
         }
 
         // PUT: api/adoptionrequest/{id}
@@ -67,23 +89,23 @@ namespace PetAdoptionAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState); // Returns 400 if the model is invalid
 
-            var success = await _adoptionrequestService.UpdateAdoptionRequestAsync(id, dto);
+            var success = await _adoptionRequestService.UpdateAdoptionRequestAsync(id, dto);
             if (!success)
-                return NotFound(); // Returns 404 if the user does not exist
+                return NotFound(); // Returns 404 if the request does not exist
 
             return NoContent(); // Returns 204 No Content on success
         }
 
         // DELETE: api/adoptionrequest/{id}
         /// <summary>
-        /// Deletes a adoption request by their ID.
+        /// Deletes an adoption request by its ID.
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAdoptionRequest(Guid id)
         {
-            var success = await _adoptionrequestService.DeleteAdoptionRequestAsync(id);
+            var success = await _adoptionRequestService.DeleteAdoptionRequestAsync(id);
             if (!success)
-                return NotFound(); // Returns 404 if the user does not exist
+                return NotFound(); // Returns 404 if the request does not exist
 
             return NoContent(); // Returns 204 No Content on successful deletion
         }
