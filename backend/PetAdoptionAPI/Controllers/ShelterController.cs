@@ -7,7 +7,7 @@ using PetAdoptionAPI.Dtos;         // For DTOs
 namespace PetAdoptionAPI.Controllers
 {
     [ApiController] // Marks this class as an API Controller
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] // Base route will be api/shelter
     public class ShelterController : ControllerBase
     {
         private readonly IShelterService _shelterService;
