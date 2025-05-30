@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // For authorization attributes
 using System;
 using System.Threading.Tasks;
 using PetAdoptionAPI.Interfaces;   // For IShelterService
@@ -6,6 +7,7 @@ using PetAdoptionAPI.Dtos;         // For DTOs
 
 namespace PetAdoptionAPI.Controllers
 {
+    [Authorize] // Ensures that only authenticated users can access this controller
     [ApiController] // Marks this class as an API Controller
     [Route("api/[controller]")] // Base route will be api/shelter
     public class ShelterController : ControllerBase
@@ -22,6 +24,7 @@ namespace PetAdoptionAPI.Controllers
         /// <summary>
         /// Retrieves a list of all shelters.
         /// </summary>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllShelters()
         {
@@ -33,6 +36,7 @@ namespace PetAdoptionAPI.Controllers
         /// <summary>
         /// Retrieves a specific shelter by its unique ID.
         /// </summary>
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetShelterById(Guid id)
         {
