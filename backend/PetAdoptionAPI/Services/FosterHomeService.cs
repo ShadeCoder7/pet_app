@@ -68,6 +68,34 @@ namespace PetAdoptionAPI.Services
             };
         }
 
+        // Get foster homes by name
+        public async Task<List<FosterHomeReadDto>> GetFosterHomesByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return new List<FosterHomeReadDto>();
+
+            var fosterHomes = await _context.FosterHomes
+                .Where(fh => EF.Functions.ILike(fh.FosterHomeName, $"%{name}%")) // Using ILike for case-insensitive search
+                .ToListAsync();
+
+            return fosterHomes.Select(fh => new FosterHomeReadDto
+            {
+                FosterHomeId = fh.FosterHomeId,
+                FosterHomeName = fh.FosterHomeName,
+                FosterHomeDescription = fh.FosterHomeDescription,
+                FosterHomeCapacity = fh.FosterHomeCapacity,
+                FosterHomeCurrentCapacity = fh.FosterHomeCurrentCapacity,
+                FosterHomeCurrentOccupancy = fh.FosterHomeCurrentOccupancy,
+                FosterHomeWebsite = fh.FosterHomeWebsite,
+                FosterHomeAddress = fh.FosterHomeAddress,
+                FosterHomePhoneNumber = fh.FosterHomePhoneNumber,
+                FosterHomeCreateDate = fh.FosterHomeCreateDate,
+                FosterHomeUpdateDate = fh.FosterHomeUpdateDate,
+                FosterHomeIsVerified = fh.FosterHomeIsVerified,
+                UserId = fh.UserId
+            }).ToList();
+        }
+
         // Create a new foster home
         public async Task<FosterHomeReadDto> CreateFosterHomeAsync(FosterHomeCreateDto dto)
         {

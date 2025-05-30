@@ -9,6 +9,7 @@ namespace PetAdoptionAPI.Interfaces
     {
         Task<List<FosterHomeReadDto>> GetAllFosterHomesAsync();
         Task<FosterHomeReadDto> GetFosterHomeByIdAsync(Guid fosterHomeId);
+        Task<List<FosterHomeReadDto>> GetFosterHomesByNameAsync(string name);
         Task<FosterHomeReadDto> CreateFosterHomeAsync(FosterHomeCreateDto fosterHomeCreateDto);
         Task<bool> UpdateFosterHomeAsync(Guid fosterHomeId, FosterHomeUpdateDto fosterHomeUpdateDto);
         Task<bool> DeleteFosterHomeAsync(Guid fosterHomeId);

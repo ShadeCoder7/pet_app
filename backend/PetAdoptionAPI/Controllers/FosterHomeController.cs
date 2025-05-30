@@ -42,6 +42,19 @@ namespace PetAdoptionAPI.Controllers
             return Ok(fosterHome);
         }
 
+        // GET: api/fosterhome/search?name={name}
+        /// <summary>
+        /// Retrieves a list of foster homes whose name contains the specified value (case-insensitive).
+        /// </summary>
+        /// <param name="name">The partial or full name to search for.</param>
+        /// <returns>A list of foster homes matching the name.</returns>
+        [HttpGet("search")]
+        public async Task<IActionResult> GetFosterHomesByName([FromQuery] string name)
+        {
+            var fosterHomes = await _fosterHomeService.GetFosterHomesByNameAsync(name);
+            return Ok(fosterHomes); // Returns 200 OK with the matching foster homes
+        }
+
         // POST: api/fosterhome
         /// <summary>
         /// Creates a new foster home.
