@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // For authorization attributes
 using System;
 using System.Threading.Tasks;
 using PetAdoptionAPI.Interfaces;   // For IUserService
@@ -6,6 +7,8 @@ using PetAdoptionAPI.Dtos;         // For DTOs
 
 namespace PetAdoptionAPI.Controllers
 {
+    // All actions require authentication except user registration (POST), which is public.
+    [Authorize] // Ensures that only authenticated users can access this controller
     [ApiController] // Marks this class as an API Controller
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -46,6 +49,7 @@ namespace PetAdoptionAPI.Controllers
         /// <summary>
         /// Creates a new user.
         /// </summary>
+        [AllowAnonymous] // Allows anonymous access to this endpoint
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto dto)
         {

@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using PetAdoptionAPI.Data;
 using PetAdoptionAPI.Interfaces;
 using PetAdoptionAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,10 +27,28 @@ builder.Services.AddScoped<IAdoptionRequestService, AdoptionRequestService>();
 // Register controllers for the REST API
 builder.Services.AddControllers();
 
+// Firebase Authentication - JWT Bearer configuration
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://securetoken.google.com/hope-and-paws";
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "https://securetoken.google.com/hope-and-paws",
+            ValidateAudience = true,
+            ValidAudience = "hope-and-paws",
+            ValidateLifetime = true
+        };
+    });
+
 var app = builder.Build();
 
 // Enable HTTPS redirection (recommended for production)
 app.UseHttpsRedirection();
+
+// Enable authentication middleware (required for JWT Bearer)
+app.UseAuthentication();
 
 // Authorization middleware (required when you implement authentication/roles)
 app.UseAuthorization();
