@@ -1,41 +1,43 @@
-// Models/AnimalImage.cs
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetAdoptionAPI.Models
 {
+
     [Table("animal_images")]
     public class AnimalImage
     {
-        // Unique ID for the animal image, with the setter private (only the database can set it)
         [Key]
-        public int AnimalImageId { get; private set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("animal_image_id")]
+        public int AnimalImageId { get; set; }  // Unique auto-incremented ID for the animal image
 
-        // URL of the image
         [Required]
-        public string ImageUrl { get; set; }
+        [Column("image_url")]
+        public string ImageUrl { get; set; }  // URL of the image
 
-        // Date when the image was uploaded
-        public DateTime UploadDate { get; set; } = DateTime.Now;
+        [Column("upload_date")]
+        public DateTime UploadDate { get; set; } = DateTime.UtcNow;  // Upload date
 
-        // Alternative text for the image (for accessibility)
-        public string ImageAlternativeText { get; set; }
+        [Column("image_alternative_text")]
+        public string? ImageAlternativeText { get; set; }  // Alternative text (accessibility)
 
-        // Description of the image
-        public string ImageDescription { get; set; }
+        [Column("image_description")]
+        public string? ImageDescription { get; set; }  // Description of the image
 
-        // Whether it is the main image for the animal
-        public bool IsMainImage { get; set; } = false;
+        [Column("is_main_image")]
+        public bool IsMainImage { get; set; } = false;  // Is this the main image for the animal?
 
-        // Whether the image is verified by an admin
-        public bool ImageIsVerified { get; set; } = false;
+        [Column("image_is_verified")]
+        public bool ImageIsVerified { get; set; } = false;  // Verified by admin
 
-        // Foreign key to the animal associated with the image
+        [Required]
+        [Column("animal_id")]
+        public Guid AnimalId { get; set; }  // Foreign key to associated animal
+
+        // Navigation property
         [ForeignKey("AnimalId")]
-        public Guid AnimalId { get; set; }
-
-        // Navigation property to access related animal information
         public Animal Animal { get; set; }
     }
 }

@@ -1,54 +1,66 @@
-// Models/Shelter.cs
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetAdoptionAPI.Models
 {
+
     [Table("shelters")]
     public class Shelter
     {
-        // Private setter for ShelterId to make it immutable outside the class
         [Key]
-        public Guid ShelterId { get; private set; }  // Unique ID for the shelter
+        [Column("shelter_id")]
+        public Guid ShelterId { get; set; }  // Unique ID, auto-generated in the DB
 
         [Required]
-        [MaxLength(100)]
+        [Column("shelter_name")]
+        [StringLength(100)]
         public string ShelterName { get; set; }  // Name of the shelter
 
         [Required]
+        [Column("shelter_address")]
         public string ShelterAddress { get; set; }  // Address of the shelter
 
         [Required]
+        [Column("shelter_description")]
         public string ShelterDescription { get; set; }  // Description of the shelter
 
         [Required]
+        [Column("shelter_capacity")]
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than zero.")]
-        public int ShelterCapacity { get; set; }  // Capacity of the shelter
+        public int ShelterCapacity { get; set; }  // Capacity (must be greater than 0)
 
         [Required]
+        [Column("shelter_current_capacity")]
         [Range(0, int.MaxValue, ErrorMessage = "Current capacity cannot be negative.")]
-        public int ShelterCurrentCapacity { get; set; }  // Current capacity of the shelter
+        public int ShelterCurrentCapacity { get; set; }  // Current capacity (>= 0)
 
         [Required]
+        [Column("shelter_current_occupancy")]
         [Range(0, int.MaxValue, ErrorMessage = "Current occupancy cannot be negative.")]
-        public int ShelterCurrentOccupancy { get; set; }  // Current occupancy of the shelter
+        public int ShelterCurrentOccupancy { get; set; }  // Current occupancy (>= 0)
 
-        public string ShelterWebsite { get; set; }  // Optional website for the shelter
+        [Column("shelter_website")]
+        public string? ShelterWebsite { get; set; }  // Optional website
 
         [Required]
-        public string ShelterPhoneNumber { get; set; }  // Phone number for the shelter
+        [Column("shelter_phone_number")]
+        [StringLength(20)]
+        public string ShelterPhoneNumber { get; set; }  // Phone number (required)
 
-        public DateTime ShelterCreateDate { get; set; } = DateTime.Now;  // When the shelter was created
+        [Column("shelter_create_date")]
+        public DateTime ShelterCreateDate { get; set; } = DateTime.UtcNow;  // Creation date
 
-        public DateTime ShelterUpdateDate { get; set; } = DateTime.Now;  // When the shelter details were last updated
+        [Column("shelter_update_date")]
+        public DateTime ShelterUpdateDate { get; set; } = DateTime.UtcNow;  // Last update date
 
+        [Column("shelter_is_verified")]
         public bool ShelterIsVerified { get; set; } = false;  // Whether the shelter is verified
 
-        // Foreign key to the users table (user responsible for the shelter)
-        public Guid? UserId { get; set; }
+        [Column("user_id")]
+        public Guid? UserId { get; set; }  // Foreign key (nullable)
 
         [ForeignKey("UserId")]
-        public User User { get; set; }  // Navigation property to the User model
+        public User? User { get; set; }  // Navigation property (nullable)
     }
 }

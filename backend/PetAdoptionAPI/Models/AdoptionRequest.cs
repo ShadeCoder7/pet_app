@@ -1,53 +1,57 @@
-// Models/AdoptionRequest.cs
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace PetAdoptionAPI.Models
 {
     [Table("adoption_requests")]
     public class AdoptionRequest
     {
-        // Unique ID for the adoption request
         [Key]
-        public Guid AdoptionRequestId { get; private set; } // Set private to make it immutable outside the class
+        [Column("adoption_request_id")]
+        public Guid AdoptionRequestId { get; set; }  // Unique ID for the request
 
-        // When the request was made
-        public DateTime RequestDate { get; set; } = DateTime.Now;
+        [Column("request_date")]
+        public DateTime RequestDate { get; set; } = DateTime.UtcNow;  // When the request was made
 
-        // When the request was last updated
-        public DateTime RequestUpdateDate { get; set; } = DateTime.Now;
+        [Column("request_update_date")]
+        public DateTime RequestUpdateDate { get; set; } = DateTime.UtcNow;  // When last updated
 
-        // Status of the request (pending, approved, rejected)
         [Required]
-        [MaxLength(20)]
-        public string RequestStatus { get; set; }
+        [Column("request_status")]
+        [StringLength(20)]
+        [RegularExpression("^(pending|approved|rejected)$", ErrorMessage = "Invalid request status.")]
+        public string RequestStatus { get; set; }  // Status of the request
 
-        // Message from the user
-        public string RequestMessage { get; set; }
+        [Column("request_message")]
+        public string? RequestMessage { get; set; }  // Message from the user (optional)
 
-        // Response from the shelter or admin
-        public string RequestResponse { get; set; }
+        [Column("request_response")]
+        public string? RequestResponse { get; set; }  // Response from shelter/admin (optional)
 
-        // When the response was given
-        public DateTime? RequestResponseDate { get; set; }
+        [Column("request_response_date")]
+        public DateTime? RequestResponseDate { get; set; }  // When the response was given (optional)
 
-        // Whether the request is verified
-        public bool RequestIsVerified { get; set; } = false;
+        [Column("request_is_verified")]
+        public bool RequestIsVerified { get; set; } = false;  // Whether the request is verified
 
-        // Whether the request is completed
-        public bool RequestIsCompleted { get; set; } = false;
+        [Column("request_is_completed")]
+        public bool RequestIsCompleted { get; set; } = false;  // Whether the request is completed
 
-        // Foreign key to the user who made the request
+        [Required]
+        [Column("user_id")]
+        public Guid UserId { get; set; }  // User who made the request
+
+        [Required]
+        [Column("animal_id")]
+        public Guid AnimalId { get; set; }  // Animal for which the request was made
+
+        // Navigation properties
         [ForeignKey("UserId")]
-        public Guid UserId { get; set; }
-
-        // Foreign key to the animal for which the request was made
-        [ForeignKey("AnimalId")]
-        public Guid AnimalId { get; set; }
-
-        // Navigation property to related user and animal entities
         public User User { get; set; }
+
+        [ForeignKey("AnimalId")]
         public Animal Animal { get; set; }
     }
 }

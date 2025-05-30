@@ -5,43 +5,59 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetAdoptionAPI.Models
 {
+
     [Table("users")]
     public class User
     {
         [Key]
-        public Guid UserId { get; private set; }  // UUID como clave primaria
+        [Column("user_id")]
+        public Guid UserId { get; set; }
 
         [Required]
+        [Column("user_email")]
         [StringLength(100)]
-        public string UserEmail { get; set; }  // Email del usuario
+        [EmailAddress] // Ensures the email is in a valid format
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format")]
+        public string UserEmail { get; set; }
 
         [Required]
+        [Column("user_role")]
+        [StringLength(20)] // Limit the length of the role string
+        [RegularExpression("^(standard|foster_home|shelter|admin)$", ErrorMessage = "Invalid role")] // Validates that the role is one of the predefined values
+        public string UserRole { get; set; }
+
+        [Column("is_role_verified")]
+        public bool IsRoleVerified { get; set; } = false;
+
+        [Required]
+        [Column("user_first_name")]
+        [StringLength(100)]
+        public string UserFirstName { get; set; }
+
+        [Required]
+        [Column("user_last_name")]
+        [StringLength(100)]
+        public string UserLastName { get; set; }
+
+        [Required]
+        [Column("user_phone_number")]
         [StringLength(20)]
-        public string UserRole { get; set; }  // Rol del usuario
+        public string UserPhoneNumber { get; set; }
 
-        public bool IsRoleVerified { get; set; }  // Verificación del rol por un admin
+        [Column("user_address")]
+        public string? UserAddress { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        public string UserFirstName { get; set; }  // Primer nombre del usuario
-
-        [Required]
-        [StringLength(100)]
-        public string UserLastName { get; set; }  // Apellido del usuario
+        [Column("create_user_date")]
+        public DateTime CreateUserDate { get; set; } = DateTime.UtcNow; // Default to current UTC time
 
         [Required]
-        [StringLength(20)]
-        public string UserPhoneNumber { get; set; }  // Número de teléfono del usuario
+        [Column("user_birth_date")]
+        public DateTime UserBirthDate { get; set; }
 
-        public string UserAddress { get; set; }  // Dirección del usuario (opcional)
+        [Column("user_profile_picture")]
+        public string? UserProfilePicture { get; set; }
 
-        public DateTime CreateUserDate { get; set; } = DateTime.UtcNow;  // Fecha de creación de la cuenta
-
-        [Required]
-        public DateTime UserBirthDate { get; set; }  // Fecha de nacimiento del usuario
-
-        public string UserProfilePicture { get; set; }  // URL o ruta de la foto de perfil
-
-        public bool UserIsVerified { get; set; } = false;  // Verificación del usuario (por ejemplo, correo)
+        [Column("user_is_verified")]
+        public bool UserIsVerified { get; set; } = false;
     }
 }

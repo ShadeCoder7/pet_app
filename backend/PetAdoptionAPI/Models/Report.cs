@@ -1,86 +1,109 @@
-// Models/Report.cs
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetAdoptionAPI.Models
 {
+
     [Table("reports")]
     public class Report
     {
-        // Private setter for ReportId to make it immutable outside the class
         [Key]
-        public Guid ReportId { get; private set; }  // Unique ID for the report
+        [Column("report_id")]
+        public Guid ReportId { get; set; }  // Unique ID for the report
 
         [Required]
-        [MaxLength(100)]
+        [Column("report_title")]
+        [StringLength(100)]
         public string ReportTitle { get; set; }  // Title of the report
 
         [Required]
-        [MaxLength(30)]
-        [RegularExpression("^(lost|found|abuse|other)$", ErrorMessage = "Report type must be one of the following: 'lost', 'found', 'abuse', 'other'.")]
-        public string ReportType { get; set; }  // Type of the report (lost, found, abuse, other)
+        [Column("report_type")]
+        [StringLength(30)]
+        [RegularExpression("^(lost|found|abuse|other)$", ErrorMessage = "Invalid report type.")]
+        public string ReportType { get; set; }  // Type of the report
 
         [Required]
-        public string ReportDescription { get; set; }  // Detailed description of the report
+        [Column("report_description")]
+        public string ReportDescription { get; set; }  // Detailed description
 
-        public DateTime ReportDate { get; set; } = DateTime.Now;  // Date when the report was created
+        [Column("report_date")]
+        public DateTime ReportDate { get; set; } = DateTime.UtcNow;  // Creation date
 
-        public DateTime ReportUpdateDate { get; set; } = DateTime.Now;  // Date when the report was last updated
+        [Column("report_update_date")]
+        public DateTime ReportUpdateDate { get; set; } = DateTime.UtcNow;  // Last update date
 
-        public string ReportImageUrl { get; set; }  // URL of the image associated with the report
+        [Column("report_image_url")]
+        public string? ReportImageUrl { get; set; }  // Image URL (optional)
 
         [Required]
-        [MaxLength(20)]
-        [RegularExpression("^(pending|in_progress|resolved|closed)$", ErrorMessage = "Report status must be one of the following: 'pending', 'in_progress', 'resolved', 'closed'.")]
+        [Column("report_status")]
+        [StringLength(20)]
+        [RegularExpression("^(pending|in_progress|resolved|closed)$", ErrorMessage = "Invalid report status.")]
         public string ReportStatus { get; set; } = "pending";  // Status of the report
 
-        public string ReportAddress { get; set; }  // Street address or specific location
+        [Column("report_address")]
+        public string? ReportAddress { get; set; }  // Address (optional)
 
-        [MaxLength(100)]
-        public string ReportCity { get; set; }  // City of the report
+        [Column("report_city")]
+        [StringLength(100)]
+        public string? ReportCity { get; set; }  // City (optional)
 
-        [MaxLength(100)]
-        public string ReportProvince { get; set; }  // Province or state
+        [Column("report_province")]
+        [StringLength(100)]
+        public string? ReportProvince { get; set; }  // Province or state (optional)
 
-        [MaxLength(15)]
-        public string ReportPostalCode { get; set; }  // Postal or ZIP code
+        [Column("report_postal_code")]
+        [StringLength(15)]
+        public string? ReportPostalCode { get; set; }  // Postal or ZIP code (optional)
 
-        [MaxLength(100)]
-        public string ReportCountry { get; set; }  // Country of the report
+        [Column("report_country")]
+        [StringLength(100)]
+        public string? ReportCountry { get; set; }  // Country (optional)
 
-        public decimal? ReportLatitude { get; set; }  // Latitude for location
+        [Column("report_latitude", TypeName = "decimal(9,6)")]
+        public decimal? ReportLatitude { get; set; }  // Latitude (optional)
 
-        public decimal? ReportLongitude { get; set; }  // Longitude for location
+        [Column("report_longitude", TypeName = "decimal(9,6)")]
+        public decimal? ReportLongitude { get; set; }  // Longitude (optional)
 
-        public bool ReportIsVerified { get; set; } = false;  // Whether the report is verified
+        [Column("report_is_verified")]
+        public bool ReportIsVerified { get; set; } = false;  // Verified flag
 
-        // Animal-specific information for the report
-        [MaxLength(75)]
-        public string AnimalName { get; set; }  // Animal name
+        [Column("animal_name")]
+        [StringLength(75)]
+        public string? AnimalName { get; set; }  // Animal name (optional)
 
-        [MaxLength(20)]
-        [RegularExpression("^(male|female|unknown)$", ErrorMessage = "Animal gender must be 'male', 'female', or 'unknown'.")]
-        public string AnimalGender { get; set; }  // Gender of the animal
+        [Column("animal_gender")]
+        [StringLength(20)]
+        [RegularExpression("^(male|female|unknown)$", ErrorMessage = "Invalid animal gender.")]
+        public string? AnimalGender { get; set; }  // Gender of animal (optional)
 
-        [MaxLength(75)]
-        public string AnimalBreed { get; set; }  // Breed of the animal
+        [Column("animal_breed")]
+        [StringLength(75)]
+        public string? AnimalBreed { get; set; }  // Breed of animal (optional)
 
-        public DateTime? LastSeenDate { get; set; }  // When the animal was last seen
+        [Column("last_seen_date")]
+        public DateTime? LastSeenDate { get; set; }  // When last seen (optional)
 
-        // Foreign keys
-        public Guid? UserId { get; set; }  // Foreign key to the user who created the report
-        public string AnimalTypeKey { get; set; }  // Foreign key to animal type (dog, cat, etc.)
-        public string AnimalSizeKey { get; set; }  // Foreign key to animal size (small, medium, large)
+        [Column("user_id")]
+        public Guid? UserId { get; set; }  // FK to user (nullable)
 
-        // Navigation properties (for easier access to related data)
+        [Column("animal_type_key")]
+        public string? AnimalTypeKey { get; set; }  // FK to animal type (nullable)
+
+        [Column("animal_size_key")]
+        public string? AnimalSizeKey { get; set; }  // FK to animal size (nullable)
+
+        // Navigation properties
+
         [ForeignKey("UserId")]
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [ForeignKey("AnimalTypeKey")]
-        public AnimalType AnimalType { get; set; }
+        public AnimalType? AnimalType { get; set; }
 
         [ForeignKey("AnimalSizeKey")]
-        public AnimalSize AnimalSize { get; set; }
+        public AnimalSize? AnimalSize { get; set; }
     }
 }
