@@ -12,6 +12,7 @@ namespace PetAdoptionAPI.Interfaces
         Task<AnimalReadDto> GetAnimalByIdAsync(Guid animalId);
         Task<AnimalReadDto> CreateAnimalAsync(AnimalCreateDto animalCreateDto);
         Task<bool> UpdateAnimalAsync(Guid animalId, AnimalUpdateDto animalUpdateDto);
+        Task<bool> PatchAnimalAsync(Guid animalId, AnimalPatchDto patchDto);
         Task<bool> DeleteAnimalAsync(Guid animalId);
     }
 }

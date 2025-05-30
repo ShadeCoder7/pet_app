@@ -74,6 +74,24 @@ namespace PetAdoptionAPI.Controllers
             return NoContent(); // Returns 204 No Content on success
         }
 
+        // PATCH: api/animal/{id}
+        /// <summary>
+        /// Partially updates an animal by ID (PATCH).
+        /// </summary>
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchAnimal(Guid id, [FromBody] AnimalPatchDto patchDto)
+        {
+            if (patchDto == null)
+                return BadRequest();
+
+            var success = await _animalService.PatchAnimalAsync(id, patchDto);
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+
         // DELETE: api/animal/{id}
         /// <summary>
         /// Deletes an animal by its ID.

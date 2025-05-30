@@ -141,7 +141,34 @@ namespace PetAdoptionAPI.Services
             var animal = await _context.Animals.FindAsync(animalId);
             if (animal == null) return false;
 
-            // Only update fields that are not null in the DTO (enables partial updates)
+            // Overwrite ALL fields directly
+            animal.AnimalName = dto.AnimalName;
+            animal.AnimalAge = dto.AnimalAge;
+            animal.AnimalGender = dto.AnimalGender;
+            animal.AnimalBreed = dto.AnimalBreed;
+            animal.AnimalDescription = dto.AnimalDescription;
+            animal.AnimalStatus = dto.AnimalStatus;
+            animal.AnimalLocation = dto.AnimalLocation;
+            animal.AnimalLatitude = dto.AnimalLatitude.HasValue ? (decimal?)dto.AnimalLatitude.Value : null;
+            animal.AnimalLongitude = dto.AnimalLongitude.HasValue ? (decimal?)dto.AnimalLongitude.Value : null;
+            animal.AnimalTypeKey = dto.AnimalTypeKey;
+            animal.AnimalSizeKey = dto.AnimalSizeKey;
+            animal.UserId = dto.UserId;
+            animal.ShelterId = dto.ShelterId;
+            animal.FosterHomeId = dto.FosterHomeId;
+
+            animal.AdUpdateDate = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // Partially update an existing animal (PATCH)
+        public async Task<bool> PatchAnimalAsync(Guid animalId, AnimalPatchDto dto)
+        {
+            var animal = await _context.Animals.FindAsync(animalId);
+            if (animal == null) return false;
+
             if (dto.AnimalName != null) animal.AnimalName = dto.AnimalName;
             if (dto.AnimalAge.HasValue) animal.AnimalAge = dto.AnimalAge;
             if (dto.AnimalGender != null) animal.AnimalGender = dto.AnimalGender;
@@ -149,8 +176,8 @@ namespace PetAdoptionAPI.Services
             if (dto.AnimalDescription != null) animal.AnimalDescription = dto.AnimalDescription;
             if (dto.AnimalStatus != null) animal.AnimalStatus = dto.AnimalStatus;
             if (dto.AnimalLocation != null) animal.AnimalLocation = dto.AnimalLocation;
-            if (dto.AnimalLatitude.HasValue) animal.AnimalLatitude = (decimal?)dto.AnimalLatitude.Value;
-            if (dto.AnimalLongitude.HasValue) animal.AnimalLongitude = (decimal?)dto.AnimalLongitude.Value;
+            if (dto.AnimalLatitude.HasValue) animal.AnimalLatitude = (decimal?)dto.AnimalLatitude;
+            if (dto.AnimalLongitude.HasValue) animal.AnimalLongitude = (decimal?)dto.AnimalLongitude;
             if (dto.AnimalTypeKey != null) animal.AnimalTypeKey = dto.AnimalTypeKey;
             if (dto.AnimalSizeKey != null) animal.AnimalSizeKey = dto.AnimalSizeKey;
             if (dto.UserId.HasValue) animal.UserId = dto.UserId;
