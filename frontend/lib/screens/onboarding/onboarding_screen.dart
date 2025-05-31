@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
+import 'package:frontend/screens/auth/login_screen.dart'; // ajusta la ruta a la tuya
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -14,10 +15,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     with SingleTickerProviderStateMixin {
   // List of animated icons (center)
   final List<IconData> _animalIcons = [
-    Icons.pets,
-    Icons.favorite,
-    Icons.home,
-    Icons.volunteer_activism,
+    Icons.pets_rounded,
+    Icons.favorite_rounded,
+    Icons.volunteer_activism_rounded,
+    Icons.house_sharp,
   ];
 
   // List of random advices to show at the bottom
@@ -61,12 +62,20 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       });
     });
 
-    // After 4 seconds, navigate to login screen
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
         _iconTimer.cancel();
-        _scaleController.dispose();
-        Navigator.pushReplacementNamed(context, '/login');
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const LoginScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        );
       }
     });
   }
@@ -81,8 +90,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     // Padding values for each element (customizable)
-    final double logoTopPadding = 0;
-    final double iconTopPadding = 50;
+    final double logoTopPadding = -50;
+    final double iconTopPadding = 120;
     final double iconBottomPadding = 0;
     final double adviceBottomPadding = 40;
 
@@ -100,8 +109,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 alignment: Alignment.topCenter,
                 child: Image.asset(
                   'assets/logo/logo_hope_paws.png',
-                  width: 260,
-                  height: 260,
+                  width: 400,
+                  height: 400,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -122,7 +131,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         scale: _scaleController.value,
                         child: Icon(
                           _animalIcons[_currentIconIndex],
-                          size: 140,
+                          size: 160,
                           color: AppColors.deepGreen,
                         ),
                       );
