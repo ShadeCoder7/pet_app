@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -51,6 +52,12 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
+  assets:
+    # An asset is a file that is bundled and deployed with your application.
+    # For Flutter, an asset can be an image, a font, or any other file.
+    - assets/icons/
+    - assets/logo/logo_hope_paws.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

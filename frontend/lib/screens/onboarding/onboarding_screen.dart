@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart'; // Import your app color palette
+import '../../utils/app_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -11,46 +10,62 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  // List of icons to animate in the center (simulate loading)
+class _OnboardingScreenState extends State<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
+  // List of animated icons (center)
   final List<IconData> _animalIcons = [
     Icons.pets,
     Icons.favorite,
-    Icons.pets,
-    Icons.access_alarm, // You can replace or add custom icons here
+    Icons.home,
+    Icons.volunteer_activism,
   ];
 
-  // List of advices/tips to display at the bottom
+  // List of random advices to show at the bottom
   final List<String> _advices = [
-    "Adopt, don't shop!",
-    "Give a shelter animal a second chance.",
-    "Every paw counts.",
-    "Your new best friend is waiting for you.",
-    "Open your heart, adopt a pet.",
+    "Cada huella cuenta.",
+    "Tu mejor amigo te está esperando.",
+    "Un hogar lo cambia todo.",
+    "El amor no se compra, se adopta.",
+    "Adoptar es un acto de amor.",
+    "Un animal rescatado es un alma agradecida.",
+    "La adopción es el primer paso hacia un mundo mejor.",
+    "La adopción es un acto de valentía y compasión.",
+    "Respetar a los animales es una obligación, amarlos es un privilegio.",
   ];
 
-  int _currentIconIndex = 0; // Track which icon is currently displayed
-  late Timer _iconTimer; // Timer for cycling icons
-  late String _advice; // Advice/tip shown at the bottom
+  int _currentIconIndex = 0; // Index of the current icon
+  late Timer _iconTimer; // Timer for icon change
+  late String _advice; // Current advice shown
+  late AnimationController
+  _scaleController; // Controls animation (scale & rotation)
 
   @override
   void initState() {
     super.initState();
 
-    // Pick a random advice to display at the bottom
+    // Select a random advice for the first build
     _advice = _advices[Random().nextInt(_advices.length)];
 
-    // Change the icon every 600 milliseconds to create a loading animation effect
-    _iconTimer = Timer.periodic(const Duration(milliseconds: 600), (timer) {
+    // Animation controller for icon scaling and rotation
+    _scaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 750),
+      lowerBound: 0.90,
+      upperBound: 1.06,
+    )..repeat(reverse: true);
+
+    // Change the icon every 900ms
+    _iconTimer = Timer.periodic(const Duration(milliseconds: 900), (timer) {
       setState(() {
         _currentIconIndex = (_currentIconIndex + 1) % _animalIcons.length;
       });
     });
 
-    // Simulate a loading screen for 3 seconds, then navigate to the Login screen
+    // After 4 seconds, navigate to login screen
     Future.delayed(const Duration(seconds: 5), () {
-      _iconTimer.cancel(); // Stop the icon animation
       if (mounted) {
+        _iconTimer.cancel();
+        _scaleController.dispose();
         Navigator.pushReplacementNamed(context, '/login');
       }
     });
@@ -58,62 +73,69 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void dispose() {
-    // Cancel the timer to prevent memory leaks
     _iconTimer.cancel();
+    _scaleController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Padding values for each element (customizable)
+    final double logoTopPadding = 0;
+    final double iconTopPadding = 50;
+    final double iconBottomPadding = 0;
+    final double adviceBottomPadding = 40;
+
     return Scaffold(
-      // Use your custom background color from the app palette
       backgroundColor: AppColors.lightBlueWhite,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
           children: [
-            // Spacer for top padding
-            const SizedBox(height: 80),
-            // Animated animal icon (centered, simulating loading)
-            Center(
+            // LOGO at the top (centered)
+            Positioned(
+              top: logoTopPadding,
+              left: 0,
+              right: 0,
               child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.lightPeach,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.softGreen.withValues(
-                        alpha: 102,
-                      ), // 40% opacity
-                      blurRadius: 16,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  _animalIcons[_currentIconIndex],
-                  size: 96,
-                  color: AppColors.deepGreen,
+                alignment: Alignment.topCenter,
+                child: Image.asset(
+                  'assets/logo/logo_hope_paws.png',
+                  width: 260,
+                  height: 260,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            // App name (brand)
-            Text(
-              "Hope & Paws",
-              style: TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: AppColors.terracotta,
-                letterSpacing: 4,
+            // ANIMATED ICON in the center
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: iconTopPadding,
+                    bottom: iconBottomPadding,
+                  ),
+                  child: AnimatedBuilder(
+                    animation: _scaleController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _scaleController.value,
+                        child: Icon(
+                          _animalIcons[_currentIconIndex],
+                          size: 140,
+                          color: AppColors.deepGreen,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
-            // Spacer to push the advice to the bottom
-            const Spacer(),
-            // Advice or tip shown at the bottom of the screen
-            Padding(
-              padding: const EdgeInsets.only(bottom: 40),
+            // ADVICE/TIP at the bottom (centered)
+            Positioned(
+              left: 24,
+              right: 24,
+              bottom: adviceBottomPadding,
               child: Text(
                 _advice,
                 textAlign: TextAlign.center,
