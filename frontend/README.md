@@ -33,10 +33,10 @@ The app aims to offer a simple, intuitive, and fast experience for both end user
 
 2. Clone the repository and navigate to the frontend directory
 
-    ```
-    git clone <repository-url>
-    cd pet_app/frontend
-    ```
+```
+git clone <repository-url>
+cd pet_app/frontend
+```
 
 3. Install dependencies
 
