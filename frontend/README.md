@@ -4,7 +4,7 @@ Mobile frontend for the **Hope&Paws** animal adoption application, developed wit
 
 ---
 
-## 📱 Description
+## Description
 
 This project is the **mobile frontend** of **Hope&Paws**, an application designed to help abandoned animals find a new home. The app allows users to:
 
@@ -17,7 +17,7 @@ The app aims to offer a simple, intuitive, and fast experience for both end user
 
 ---
 
-## 🚀 Technologies Used
+## Technologies Used
 
 - Flutter (main framework)
 - Dart (programming language)
@@ -25,7 +25,7 @@ The app aims to offer a simple, intuitive, and fast experience for both end user
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 1. Prerequisites  
     - [Flutter](https://docs.flutter.dev/get-started/install) and [Dart](https://dart.dev/get-dart) installed
@@ -52,7 +52,7 @@ flutter run
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 - `lib/` – Main source code (screens, widgets, logic)
 - `android/` – Android build files
@@ -62,13 +62,13 @@ flutter run
 
 ---
 
-## 📚 Useful Resources
+## Useful Resources
 
 - [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)  
 - [Flutter Documentation](https://docs.flutter.dev/)
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the terms specified in the root repository.
