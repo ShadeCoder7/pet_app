@@ -12,8 +12,8 @@ import 'screens/options/options_menu_screen.dart';
 import 'screens/reports/reports_menu_screen.dart';
 import 'screens/requests/requests_menu_screen.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HopePawsApp extends StatelessWidget {
+  const HopePawsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
