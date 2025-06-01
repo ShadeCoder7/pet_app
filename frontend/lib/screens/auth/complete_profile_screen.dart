@@ -52,7 +52,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       }
 
       // Prepare the POST request to save the user profile
-      final url = Uri.parse('https://localhost:7105/api/user');
+      final url = Uri.parse('http://10.0.2.2:7105/api/user');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -66,8 +66,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           'userAddress': _addressController.text.trim().isEmpty
               ? null
               : _addressController.text.trim(),
-          'userBirthDate': _birthDate!.toIso8601String(),
-          'userProfilePicture': null,
+          'userBirthDate': _birthDate!.toUtc().toIso8601String(),
+          'userProfilePicture': '', // Optional, can be set later
         }),
       );
 
