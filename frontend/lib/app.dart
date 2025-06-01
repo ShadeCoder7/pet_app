@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/auth/complete_profile_screen.dart';
 import 'screens/menu/main_menu_screen.dart';
 import 'screens/animal/animal_list_screen.dart';
 import 'screens/animal/animal_profile_screen.dart';
@@ -27,6 +28,7 @@ class HopePawsApp extends StatelessWidget {
         '/onboarding': (context) => OnboardingScreen(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
+        '/complete-profile': (context) => CompleteProfileScreen(),
         '/main': (context) => MainMenuScreen(),
         '/animal-list': (context) => AnimalListScreen(),
         '/animal-profile': (context) => AnimalProfileScreen(),
