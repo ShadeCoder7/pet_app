@@ -4,6 +4,7 @@ import '../../utils/app_colors.dart';
 import '../../utils/fade_route.dart';
 import 'register_screen.dart';
 import '/screens/auth/session_check_screen.dart';
+import '/screens/menu/main_menu_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -59,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Use fade transition to navigate to MainMenuScreen
       Navigator.of(
         context,
-      ).pushReplacement(createFadeRoute(const SessionCheckScreen()));
+      ).pushReplacement(createFadeRoute(const MainMenuScreen()));
     } on FirebaseAuthException catch (e) {
       setState(() {
         _isLoading = false;
