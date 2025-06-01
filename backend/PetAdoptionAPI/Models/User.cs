@@ -14,6 +14,11 @@ namespace PetAdoptionAPI.Models
         public Guid UserId { get; set; }
 
         [Required]
+        [Column("firebase_uid")]
+        [StringLength(128)]
+        public string FirebaseUid { get; set; }
+
+        [Required]
         [Column("user_email")]
         [StringLength(100)]
         [EmailAddress] // Ensures the email is in a valid format
