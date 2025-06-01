@@ -109,210 +109,294 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double logoTopPadding = -30;
+    final double formTopPadding = 200;
+
     return Scaffold(
-      backgroundColor: AppColors.deepGreen, // Main background color
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Title
-              Text(
-                'Completa tu perfil',
-                style: TextStyle(
-                  color: AppColors.lightBlueWhite,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+      backgroundColor: AppColors.lightBlueWhite,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Logo arriba centrado
+            Positioned(
+              top: logoTopPadding,
+              left: 0,
+              right: 0,
+              child: Container(
+                alignment: Alignment.topCenter,
+                child: Image.asset(
+                  'assets/logo/logo_hope_paws.png',
+                  width: 300,
+                  height: 300,
+                  fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 36),
+            ),
 
-              // First name input field
-              TextField(
-                controller: _firstNameController,
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.lightBlueWhite,
-                  hintText: "Nombre",
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
-                  ),
-                  prefixIcon: Icon(Icons.person, color: AppColors.softGreen),
-                ),
-              ),
-              const SizedBox(height: 18),
+            // Formulario posicionado con padding top
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(top: formTopPadding),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 24),
 
-              // Last name input field
-              TextField(
-                controller: _lastNameController,
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.lightBlueWhite,
-                  hintText: "Apellidos",
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
-                  ),
-                  prefixIcon: Icon(Icons.badge, color: AppColors.softGreen),
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Phone number input field
-              TextField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.lightBlueWhite,
-                  hintText: "Teléfono",
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
-                  ),
-                  prefixIcon: Icon(Icons.phone, color: AppColors.softGreen),
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Birth date input field (using date picker)
-              InkWell(
-                onTap: _pickBirthDate,
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.lightBlueWhite,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 20,
-                    ),
-                    prefixIcon: Icon(Icons.cake, color: AppColors.softGreen),
-                  ),
-                  child: Text(
-                    _birthDate != null
-                        ? "${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}"
-                        : "Fecha de nacimiento",
-                    style: TextStyle(
-                      color: _birthDate != null ? Colors.black : Colors.black54,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Address input field (optional)
-              TextField(
-                controller: _addressController,
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.lightBlueWhite,
-                  hintText: "Dirección (opcional)",
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
-                  ),
-                  prefixIcon: Icon(Icons.home, color: AppColors.softGreen),
-                ),
-              ),
-              const SizedBox(height: 28),
-
-              // Save button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.terracotta,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: _isLoading
-                      ? CircularProgressIndicator(
-                          color: AppColors.lightBlueWhite,
-                        )
-                      : const Text(
-                          'Guardar perfil',
+                        // Título o frase motivadora (puedes cambiarlo o eliminarlo)
+                        Text(
+                          "Completa tu perfil",
                           style: TextStyle(
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.white,
+                            color: AppColors.deepGreen,
                           ),
                         ),
-                ),
-              ),
-              const SizedBox(height: 16),
 
-              // Error message (if any)
-              // Error message (if any)
-              if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.lightBlueWhite,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: AppColors.terracotta,
-                        width: 1.5,
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.error_outline, color: AppColors.terracotta),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            _errorMessage!,
-                            style: TextStyle(
-                              color: AppColors.terracotta,
-                              fontWeight: FontWeight.w600,
+                        const SizedBox(height: 28),
+
+                        // Nombre
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: TextField(
+                            controller: _firstNameController,
+                            style: TextStyle(color: AppColors.deepGreen),
+                            decoration: InputDecoration(
+                              hintText: "Nombre",
+                              labelStyle: TextStyle(color: AppColors.deepGreen),
+                              prefixIcon: Icon(
+                                Icons.person,
+                                color: AppColors.deepGreen,
+                              ),
+                              filled: true,
+                              fillColor: AppColors.softGreen,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 20,
+                              ),
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 16),
+
+                        // Apellidos
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: TextField(
+                            controller: _lastNameController,
+                            style: TextStyle(color: AppColors.deepGreen),
+                            decoration: InputDecoration(
+                              hintText: "Apellidos",
+                              labelStyle: TextStyle(color: AppColors.deepGreen),
+                              prefixIcon: Icon(
+                                Icons.badge,
+                                color: AppColors.deepGreen,
+                              ),
+                              filled: true,
+                              fillColor: AppColors.softGreen,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Teléfono
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: TextField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                            style: TextStyle(color: AppColors.deepGreen),
+                            decoration: InputDecoration(
+                              hintText: "Teléfono",
+                              labelStyle: TextStyle(color: AppColors.deepGreen),
+                              prefixIcon: Icon(
+                                Icons.phone,
+                                color: AppColors.deepGreen,
+                              ),
+                              filled: true,
+                              fillColor: AppColors.softGreen,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: InkWell(
+                            onTap: _pickBirthDate,
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.cake,
+                                  color: AppColors.deepGreen,
+                                ),
+                                filled: true,
+                                fillColor: AppColors.softGreen,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 20,
+                                ),
+                                // No hintText aquí porque lo mostramos con el Text
+                              ),
+                              child: Text(
+                                _birthDate != null
+                                    ? "${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}"
+                                    : "Fecha de nacimiento",
+                                style: TextStyle(
+                                  color: AppColors.deepGreen.withValues(),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Dirección (opcional)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: TextField(
+                            controller: _addressController,
+                            style: TextStyle(color: AppColors.deepGreen),
+                            decoration: InputDecoration(
+                              hintText: "Dirección (opcional)",
+                              labelStyle: TextStyle(color: AppColors.deepGreen),
+                              prefixIcon: Icon(
+                                Icons.home,
+                                color: AppColors.deepGreen,
+                              ),
+                              filled: true,
+                              fillColor: AppColors.softGreen,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 28),
+
+                        // Botón guardar perfil
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _saveProfile,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.deepGreen,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                elevation: 5,
+                              ),
+                              child: _isLoading
+                                  ? CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.softGreen,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Guardar perfil',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: AppColors.softGreen,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Mensaje de error
+                        if (_errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: AppColors.lightPeach,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.terracotta,
+                                  width: 1.2,
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 14,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: AppColors.terracotta,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _errorMessage!,
+                                      style: TextStyle(
+                                        color: AppColors.terracotta,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
                 ),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
