@@ -4,6 +4,7 @@ namespace PetAdoptionAPI.Dtos
     public class UserReadDto
     {
         public Guid UserId { get; set; }
+        public string FirebaseUid { get; set; }
         public string UserEmail { get; set; }
         public string UserRole { get; set; }
         public bool IsRoleVerified { get; set; }

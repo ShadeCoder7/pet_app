@@ -3,6 +3,7 @@ namespace PetAdoptionAPI.Dtos
 {
     public class UserCreateDto
     {
+        public string FirebaseUid { get; set; }
         public string UserEmail { get; set; }
         public string UserRole { get; set; }
         public string UserFirstName { get; set; }
