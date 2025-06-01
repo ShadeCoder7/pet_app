@@ -66,6 +66,32 @@ namespace PetAdoptionAPI.Services
             };
         }
 
+        // Get a user by FirebaseUid
+        public async Task<UserReadDto> GetUserByFirebaseUidAsync(string firebaseUid)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.FirebaseUid == firebaseUid);
+
+            if (user == null) return null;
+
+            return new UserReadDto
+            {
+                UserId = user.UserId,
+                FirebaseUid = user.FirebaseUid,
+                UserEmail = user.UserEmail,
+                UserRole = user.UserRole,
+                IsRoleVerified = user.IsRoleVerified,
+                UserFirstName = user.UserFirstName,
+                UserLastName = user.UserLastName,
+                UserPhoneNumber = user.UserPhoneNumber,
+                UserAddress = user.UserAddress,
+                CreateUserDate = user.CreateUserDate,
+                UserBirthDate = user.UserBirthDate,
+                UserProfilePicture = user.UserProfilePicture,
+                UserIsVerified = user.UserIsVerified
+            };
+        }
+
         // Create a new user
         public async Task<UserReadDto> CreateUserAsync(UserCreateDto dto)
         {

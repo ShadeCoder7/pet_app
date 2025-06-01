@@ -9,6 +9,7 @@ namespace PetAdoptionAPI.Interfaces
     {
         Task<List<UserReadDto>> GetAllUsersAsync();
         Task<UserReadDto> GetUserByIdAsync(Guid userId);
+        Task<UserReadDto> GetUserByFirebaseUidAsync(string firebaseUid);
         Task<UserReadDto> CreateUserAsync(UserCreateDto userCreateDto);
         Task<bool> UpdateUserAsync(Guid userId, UserUpdateDto userUpdateDto);
         Task<bool> PatchUserAsync(Guid userId, UserPatchDto userPatchDto);
