@@ -26,6 +26,9 @@ services:
       - "${PGADMIN_PORT}:80"
     depends_on:
       - db
+    volumes:
+      - ${PGADMIN_VOLUME_NAME:-pgadmin_data}:/var/lib/pgadmin
 
 volumes:
   postgres_data:
+  pgadmin_data:
