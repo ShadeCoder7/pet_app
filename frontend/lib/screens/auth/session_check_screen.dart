@@ -26,10 +26,11 @@ class _SessionCheckScreenState extends State<SessionCheckScreen> {
     try {
       // Endpoint of your backend (adapt for emulator if needed)
       final url = Uri.parse(
-        'https://localhost:7105/api/user/firebase/${user.uid}',
+        'http://10.0.2.2:7105/api/user/firebase/${user.uid}',
       );
       final response = await http.get(url);
 
+      // Check if the widget is still mounted before navigating
       if (!mounted) return;
       if (response.statusCode == 200) {
         // User exists, go to main menu
