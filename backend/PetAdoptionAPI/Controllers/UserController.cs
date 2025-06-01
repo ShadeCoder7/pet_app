@@ -45,6 +45,20 @@ namespace PetAdoptionAPI.Controllers
             return Ok(user);
         }
 
+        // GET: api/user/firebase/{firebaseUid}
+        /// <summary>
+        /// Retrieves a user by their Firebase UID.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet("firebase/{firebaseUid}")]
+        public async Task<IActionResult> GetUserByFirebaseUid(string firebaseUid)
+        {
+            var user = await _userService.GetUserByFirebaseUidAsync(firebaseUid);
+            if (user == null)
+                return NotFound();
+            return Ok(user);
+        }
+
         // POST: api/user
         /// <summary>
         /// Creates a new user.
