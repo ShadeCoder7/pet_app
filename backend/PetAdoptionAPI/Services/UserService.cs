@@ -98,6 +98,7 @@ namespace PetAdoptionAPI.Services
             var user = new User
             {
                 // UserId is generated automatically by PostgreSQL (uuid_generate_v4()).
+                FirebaseUid = dto.FirebaseUid,
                 UserEmail = dto.UserEmail,
                 UserRole = dto.UserRole,
                 IsRoleVerified = false, // Default, to be updated by admin if needed
