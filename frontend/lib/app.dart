@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -21,9 +22,7 @@ class HopePawsApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hope&Paws',
       debugShowCheckedModeBanner: false,
-      // Set the initial route (entry screen when the app launches)
       initialRoute: '/onboarding',
-      // Map each route to its corresponding screen widget
       routes: {
         '/onboarding': (context) => OnboardingScreen(),
         '/login': (context) => LoginScreen(),
@@ -38,11 +37,16 @@ class HopePawsApp extends StatelessWidget {
         '/reports': (context) => ReportsMenuScreen(),
         '/requests': (context) => RequestsMenuScreen(),
       },
-      // Set a base theme for the app (customize as needed)
       theme: ThemeData(
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      supportedLocales: const [Locale('es', ''), Locale('en', '')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }
