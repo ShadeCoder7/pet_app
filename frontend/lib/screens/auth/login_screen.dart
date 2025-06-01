@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/fade_route.dart';
 import 'register_screen.dart';
-import '../menu/main_menu_screen.dart';
+import '/screens/auth/session_check_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,12 +19,36 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // Shows the error message and hides it after 3 seconds
+  void _showErrorMessage(String message) {
+    setState(() {
+      _errorMessage = message;
+    });
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _errorMessage == message) {
+        setState(() {
+          _errorMessage = null;
+        });
+      }
+    });
+  }
+
   // Method to handle login using Firebase Auth
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
+
+    // Input validation before Firebase call
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorMessage("Los campos no pueden estar vacíos.");
+      return;
+    }
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -35,11 +59,21 @@ class _LoginScreenState extends State<LoginScreen> {
       // Use fade transition to navigate to MainMenuScreen
       Navigator.of(
         context,
-      ).pushReplacement(createFadeRoute(const MainMenuScreen()));
+      ).pushReplacement(createFadeRoute(const SessionCheckScreen()));
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _errorMessage = e.message;
+        _isLoading = false;
       });
+      // Custom messages for common Firebase errors
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        _showErrorMessage("Email o contraseña incorrectos.");
+      } else if (e.code == 'invalid-email') {
+        _showErrorMessage("El email introducido no tiene un formato válido.");
+      } else {
+        _showErrorMessage(
+          "Ha fallado el inicio de sesión. Inténtalo de nuevo.",
+        );
+      }
     } finally {
       setState(() {
         _isLoading = false;
@@ -50,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // Padding values for logo and login form
-    final double logoTopPadding = 10;
+    final double logoTopPadding = -30;
     final double formTopPadding = 300;
 
     return Scaffold(
@@ -67,8 +101,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 alignment: Alignment.topCenter,
                 child: Image.asset(
                   'assets/logo/logo_hope_paws.png',
-                  width: 350,
-                  height: 350,
+                  width: 400,
+                  height: 400,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -177,17 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        // Display error message if any
-                        if (_errorMessage != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            _errorMessage!,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                        // Space before the next section
                         const SizedBox(height: 16),
                         // Go to Register button
                         Row(
@@ -217,6 +241,52 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
+                        // Display error message if any (with fade-out)
+                        if (_errorMessage != null) ...[
+                          const SizedBox(height: 16),
+                          // Error message container
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: AppColors
+                                    .lightPeach, // Soft background for error
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.terracotta,
+                                  width: 1.2,
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 14,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: AppColors.terracotta,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _errorMessage!,
+                                      style: TextStyle(
+                                        color: AppColors.terracotta,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

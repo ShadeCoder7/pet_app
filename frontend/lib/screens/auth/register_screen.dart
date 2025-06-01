@@ -18,27 +18,92 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Method to register user using Firebase Auth
+  // Shows the error message and hides it after 3 seconds
+  void _showErrorMessage(String message) {
+    setState(() {
+      _errorMessage = message;
+    });
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _errorMessage == message) {
+        setState(() {
+          _errorMessage = null;
+        });
+      }
+    });
+  }
+
+  // Method to register user using Firebase Auth (code comments in English, messages in Spanish)
   Future<void> _register() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
+    final String email = emailController.text.trim();
+    final String password = passwordController.text.trim();
+
+    // Validate email format with a simple regex
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+
+    // Regex for a strong password: at least 8 characters, upper and lower case, number, and symbol
+    final passwordRegex = RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$',
+    );
+
+    // Check if fields are empty
+    if (email.isEmpty || password.isEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorMessage("Los campos no pueden estar vacíos.");
+      return;
+    }
+
+    // Check if email has a valid format
+    if (!emailRegex.hasMatch(email)) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorMessage("Por favor, introduce un email válido.");
+      return;
+    }
+
+    // Check if password is strong enough
+    if (!passwordRegex.hasMatch(password)) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorMessage(
+        "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un símbolo.",
+      );
+      return;
+    }
+
     try {
+      // Try to register the user with Firebase Auth
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: email,
+        password: password,
       );
       if (!mounted) return;
-      // Use fade transition to LoginScreen
+      // Navigate to LoginScreen with fade transition
       Navigator.of(
         context,
       ).pushReplacement(createFadeRoute(const LoginScreen()));
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _errorMessage = e.message;
+        _isLoading = false;
       });
+      // Show custom messages for common Firebase errors
+      if (e.code == 'email-already-in-use') {
+        _showErrorMessage("Este email ya está en uso.");
+      } else if (e.code == 'invalid-email') {
+        _showErrorMessage("El email introducido no tiene un formato válido.");
+      } else if (e.code == 'weak-password') {
+        _showErrorMessage("La contraseña es demasiado débil.");
+      } else {
+        _showErrorMessage("El registro ha fallado. Inténtalo de nuevo.");
+      }
     } finally {
       setState(() {
         _isLoading = false;
@@ -49,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     // Padding values as in LoginScreen
-    final double logoTopPadding = 10;
+    final double logoTopPadding = -30;
     final double formTopPadding = 300;
 
     return Scaffold(
@@ -66,8 +131,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 alignment: Alignment.topCenter,
                 child: Image.asset(
                   'assets/logo/logo_hope_paws.png',
-                  width: 350,
-                  height: 350,
+                  width: 400,
+                  height: 400,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -183,7 +248,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     )
                                   : Text(
                                       'Registrarse',
-                                      // Corrected text for the button
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: AppColors.softGreen,
@@ -193,17 +257,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                         ),
-                        // Error message
-                        if (_errorMessage != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            _errorMessage!,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                        // Space before the next section
                         const SizedBox(height: 16),
                         // Go back to Login
                         Row(
@@ -233,6 +287,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ],
                         ),
+                        // Error message with fade-out
+                        if (_errorMessage != null) ...[
+                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: AppColors.lightPeach,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.terracotta,
+                                  width: 1.2,
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 14,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: AppColors.terracotta,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _errorMessage!,
+                                      style: TextStyle(
+                                        color: AppColors.terracotta,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
