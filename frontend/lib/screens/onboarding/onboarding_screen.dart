@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
-import 'package:frontend/screens/auth/login_screen.dart'; // ajusta la ruta a la tuya
+import '../../utils/fade_route.dart'; // Import fade transition helper
+import 'package:frontend/screens/auth/login_screen.dart'; // Adjust path as needed
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -65,17 +66,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
         _iconTimer.cancel();
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const LoginScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
-        );
+        // --- FADING NAVIGATION TO LOGIN ---
+        Navigator.of(
+          context,
+        ).pushReplacement(createFadeRoute(const LoginScreen()));
       }
     });
   }
