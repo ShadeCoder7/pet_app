@@ -148,8 +148,12 @@ class MainMenuScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Navigate to the full animal list screen
-                      Navigator.pushNamed(context, '/animal-list');
+                      // Navegar a la lista de animales, pasando siempre el nombre de usuario
+                      Navigator.pushNamed(
+                        context,
+                        '/animal-list',
+                        arguments: userName,
+                      );
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.deepGreen,
@@ -180,7 +184,7 @@ class MainMenuScreen extends StatelessWidget {
               ),
             ),
             // Bottom navigation bar with 5 buttons
-            _MainMenuNavigationBar(),
+            _MainMenuNavigationBar(userName: userName),
           ],
         ),
       ),
@@ -250,11 +254,11 @@ class _AnimalCard extends StatelessWidget {
 
 // Bottom navigation bar widget with 5 icon buttons and Spanish tooltips
 class _MainMenuNavigationBar extends StatelessWidget {
-  const _MainMenuNavigationBar();
+  final String userName;
+  const _MainMenuNavigationBar({required this.userName});
 
   @override
   Widget build(BuildContext context) {
-    // Helper function to show a quick feedback message
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       decoration: BoxDecoration(
@@ -309,7 +313,8 @@ class _MainMenuNavigationBar extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.pets, color: Colors.white, size: 36),
               onPressed: () {
-                Navigator.pushNamed(context, '/adopt');
+                // ¡Aquí también pásalo si la pantalla lo requiere!
+                Navigator.pushNamed(context, '/adopt', arguments: userName);
               },
               tooltip: 'Adoptar', // Visible tooltip in Spanish
             ),
