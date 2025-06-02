@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import '../../models/animal.dart' as model_animal;
 
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -34,7 +35,7 @@ class HopePawsApp extends StatelessWidget {
       '/adopt': (_) => const AdoptMenuScreen(),
       // '/main' will be handled in onGenerateRoute to pass userName
       // '/animal-list': (_) => const AnimalListScreen(),
-      '/animal-profile': (_) => const AnimalProfileScreen(),
+      //'/animal-profile': (_) => const AnimalProfileScreen(),
       '/add-animal': (_) => const AddAnimalScreen(),
       '/public-profile': (_) => const PublicProfileScreen(),
       '/options': (_) => const OptionsMenuScreen(),
@@ -72,6 +73,18 @@ class HopePawsApp extends StatelessWidget {
               appBar: AppBar(title: const Text('Error')),
               body: const Center(
                 child: Text('No se proporcionó el nombre de usuario.'),
+              ),
+            );
+          }
+        } else if (routeName == '/animal-profile') {
+          final args = settings.arguments;
+          if (args is model_animal.Animal) {
+            builder = (_) => AnimalProfileScreen(animal: args);
+          } else {
+            builder = (_) => Scaffold(
+              appBar: AppBar(title: const Text('Error')),
+              body: const Center(
+                child: Text('No se proporcionó el animal para el perfil.'),
               ),
             );
           }
