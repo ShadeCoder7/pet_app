@@ -27,5 +27,6 @@ namespace PetAdoptionAPI.Dtos
         public DateTime AdUpdateDate { get; set; }
         // List of associated images (using DTO for images).
         public List<AnimalImageReadDto> Images { get; set; }
+        public string? ImageUrl { get; set; } // Principal image for the animal
     }
 }
