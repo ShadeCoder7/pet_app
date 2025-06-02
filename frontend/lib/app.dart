@@ -33,7 +33,7 @@ class HopePawsApp extends StatelessWidget {
       '/favorites': (_) => const FavoritesMenuScreen(),
       '/adopt': (_) => const AdoptMenuScreen(),
       // '/main' will be handled in onGenerateRoute to pass userName
-      '/animal-list': (_) => const AnimalListScreen(),
+      // '/animal-list': (_) => const AnimalListScreen(),
       '/animal-profile': (_) => const AnimalProfileScreen(),
       '/add-animal': (_) => const AddAnimalScreen(),
       '/public-profile': (_) => const PublicProfileScreen(),
@@ -52,13 +52,22 @@ class HopePawsApp extends StatelessWidget {
         WidgetBuilder? builder;
 
         if (routeName == '/main') {
-          // Extract the userName argument that must have been passed via Navigator.pushNamed
           final args = settings.arguments;
           if (args is String) {
-            // If a valid String argument is provided, pass it to MainMenuScreen
             builder = (_) => MainMenuScreen(userName: args);
           } else {
-            // If no valid argument is provided, show an error page in Spanish
+            builder = (_) => Scaffold(
+              appBar: AppBar(title: const Text('Error')),
+              body: const Center(
+                child: Text('No se proporcionó el nombre de usuario.'),
+              ),
+            );
+          }
+        } else if (routeName == '/animal-list') {
+          final args = settings.arguments;
+          if (args is String) {
+            builder = (_) => AnimalListScreen(userName: args);
+          } else {
             builder = (_) => Scaffold(
               appBar: AppBar(title: const Text('Error')),
               body: const Center(
@@ -67,7 +76,6 @@ class HopePawsApp extends StatelessWidget {
             );
           }
         } else {
-          // For all other routes, look up the routes map
           builder = routes[routeName];
         }
 
