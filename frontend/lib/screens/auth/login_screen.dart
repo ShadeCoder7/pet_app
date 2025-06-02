@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http; // Import http to call custom backend
+import 'dart:convert'; // Import convert to decode JSON
 import '../../utils/app_colors.dart';
-import 'register_screen.dart';
-import '/screens/auth/session_check_screen.dart';
+import '/screens/menu/main_menu_screen.dart'; // Import MainMenuScreen to navigate after login
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -32,6 +33,39 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  /// Method to fetch the user’s first name from your backend,
+  /// using the same route as SessionCheckScreen: GET /api/user/firebase/{uid}
+  Future<String?> _fetchUserNameFromBackend(String uid) async {
+    // NOTE: On the Android emulator, “localhost” does not work;
+    // so we use “10.0.2.2” to point to the host machine.
+    final Uri url = Uri.parse('http://10.0.2.2:7105/api/user/firebase/$uid');
+
+    try {
+      final http.Response response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        // Your backend returns “userFirstName”
+        final String? firstName = data['userFirstName'] as String?;
+        // We ignore lastName now, because we only want to show firstName
+        if (firstName != null && firstName.isNotEmpty) {
+          return firstName;
+        }
+        // If “userFirstName” does not exist or is empty, consider profile incomplete
+        return null;
+      } else if (response.statusCode == 404) {
+        // The endpoint did not find a record with that UID.
+        return null;
+      } else {
+        // Any other server error.
+        return null;
+      }
+    } catch (e) {
+      // Network error or JSON parsing error; return null to force profile completion.
+      return null;
+    }
+  }
+
   // Method to handle login using Firebase Auth
   Future<void> _login() async {
     setState(() {
@@ -39,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
 
-    // Input validation before Firebase call
+    // Basic validation before calling Firebase
     if (emailController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty) {
       setState(() {
@@ -50,13 +84,39 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+      // Sign in with email and password using Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+
+      // Get the currently signed-in user
+      final User? user = userCredential.user;
+      if (user == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorMessage("No se pudo obtener la información del usuario.");
+        return;
+      }
+
+      // Fetch user's name from custom backend using UID
+      final String? nombreUsuario = await _fetchUserNameFromBackend(user.uid);
+
       if (!mounted) return;
-      // Use fade transition to navigate to MainMenuScreen
-      Navigator.pushReplacementNamed(context, '/session-check');
+
+      if (nombreUsuario == null || nombreUsuario.isEmpty) {
+        // If name is not in backend, redirect to CompleteProfileScreen
+        Navigator.pushReplacementNamed(context, '/complete-profile');
+      } else {
+        // Navigate to MainMenuScreen, passing the fetched userName
+        Navigator.pushReplacementNamed(
+          context,
+          '/main',
+          arguments: nombreUsuario,
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         _isLoading = false;
@@ -71,6 +131,11 @@ class _LoginScreenState extends State<LoginScreen> {
           "Ha fallado el inicio de sesión. Inténtalo de nuevo.",
         );
       }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorMessage("Ocurrió un error inesperado. Inténtalo de nuevo.");
     } finally {
       setState(() {
         _isLoading = false;
@@ -208,7 +273,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        // Space before the next section
                         const SizedBox(height: 16),
                         // Go to Register button
                         Row(
@@ -223,7 +287,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             TextButton(
                               onPressed: () {
-                                // Use fade transition to go to RegisterScreen
                                 Navigator.pushReplacementNamed(
                                   context,
                                   '/register',
@@ -239,17 +302,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        // Display error message if any (with fade-out)
+                        // Display error message if any
                         if (_errorMessage != null) ...[
                           const SizedBox(height: 16),
-                          // Error message container
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: AppColors
-                                    .lightPeach, // Soft background for error
+                                color: AppColors.lightPeach,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: AppColors.terracotta,
