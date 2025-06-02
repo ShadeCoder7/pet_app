@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
+import '../../models/animal.dart';
+import '../../models/animal_image.dart';
 import '../../utils/app_colors.dart';
 
 class AnimalProfileScreen extends StatelessWidget {
-  const AnimalProfileScreen({Key? key}) : super(key: key);
+  final Animal animal;
+
+  const AnimalProfileScreen({Key? key, required this.animal}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Find main image or first one
+    AnimalImage? mainImage = animal.images.isNotEmpty
+        ? (animal.images.firstWhere(
+            (img) => img.isMainImage,
+            orElse: () => animal.images[0],
+          ))
+        : null;
+
     return Scaffold(
-      backgroundColor:
-          AppColors.lightBlueWhite, // Use consistent background color
+      backgroundColor: AppColors.lightBlueWhite,
       appBar: AppBar(
-        backgroundColor: AppColors.deepGreen, // Primary color for header
+        backgroundColor: AppColors.deepGreen,
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'Perfil del Animal', // Visible text in Spanish for the user
+          'Perfil del Animal',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -26,41 +37,76 @@ class AnimalProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Secondary heading
-              Text(
-                'Detalles del Peludito', // Visible text in Spanish for the user
-                style: TextStyle(
-                  color: AppColors.terracotta,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Placeholder content when no data is available yet
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.pets, color: AppColors.terracotta, size: 80),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Aquí verás la información detallada del animal.', // Visible text in Spanish
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.deepGreen,
-                          fontSize: 16,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Animal Image
+                Center(
+                  child: mainImage != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: Image.network(
+                            mainImage.imageUrl,
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Icon(
+                          Icons.pets,
+                          color: AppColors.terracotta,
+                          size: 120,
                         ),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 22),
+
+                // Animal Name
+                Text(
+                  animal.animalName,
+                  style: TextStyle(
+                    color: AppColors.deepGreen,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              // (Later: replace placeholder with actual animal image, name, edad, descripción, etc.)
-            ],
+                const SizedBox(height: 8),
+
+                // Breed, age, and status
+                Text(
+                  '${animal.animalBreed} | ${animal.animalAge ?? "-"} años',
+                  style: TextStyle(
+                    color: AppColors.terracotta,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+
+                Text(
+                  'Estado: ${animal.animalStatus}',
+                  style: TextStyle(color: AppColors.deepGreen, fontSize: 16),
+                ),
+                const SizedBox(height: 14),
+
+                // Description
+                Text(
+                  'Descripción',
+                  style: TextStyle(
+                    color: AppColors.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  animal.animalDescription,
+                  style: TextStyle(color: AppColors.deepGreen, fontSize: 16),
+                ),
+                const SizedBox(height: 20),
+                // Aquí puedes añadir más campos (ubicación, tipo, etc.)
+              ],
+            ),
           ),
         ),
       ),
