@@ -22,42 +22,93 @@ namespace PetAdoptionAPI.Services
         // Get all animals
         public async Task<List<AnimalReadDto>> GetAllAnimalsAsync()
         {
+            // Load all animals from the database
             var animals = await _context.Animals.ToListAsync();
 
-            var animalDtos = animals.Select(a => new AnimalReadDto
+            // Get all images that are main images, grouped by animal_id
+            var animalImages = await _context.AnimalImages
+                .Where(img => img.IsMainImage)
+                .ToListAsync();
+
+            // Build the DTOs with the main image included
+            var animalDtos = animals.Select(a =>
             {
-                AnimalId = a.AnimalId,
-                AnimalName = a.AnimalName,
-                AnimalAge = a.AnimalAge,
-                AnimalGender = a.AnimalGender,
-                AnimalBreed = a.AnimalBreed,
-                AnimalDescription = a.AnimalDescription,
-                AnimalStatus = a.AnimalStatus,
-                AnimalLocation = a.AnimalLocation,
-                // Safe cast from decimal? (model) to double? (DTO)
-                AnimalLatitude = a.AnimalLatitude.HasValue ? (double?)a.AnimalLatitude.Value : null,
-                AnimalLongitude = a.AnimalLongitude.HasValue ? (double?)a.AnimalLongitude.Value : null,
-                AnimalTypeKey = a.AnimalTypeKey,
-                AnimalSizeKey = a.AnimalSizeKey,
-                UserId = a.UserId,
-                ShelterId = a.ShelterId,
-                FosterHomeId = a.FosterHomeId,
-                AnimalIsVerified = a.AnimalIsVerified,
-                AdPostedDate = a.AdPostedDate,
-                AdUpdateDate = a.AdUpdateDate,
-                // The Images property is left empty for now.
-                Images = new List<AnimalImageReadDto>()
+                // Find the main image for this animal (if any)
+                var mainImage = animalImages.FirstOrDefault(img => img.AnimalId == a.AnimalId);
+
+                // Build the images list with the main image only (you could add more if needed)
+                var images = new List<AnimalImageReadDto>();
+                if (mainImage != null)
+                {
+                    images.Add(new AnimalImageReadDto
+                    {
+                        AnimalImageId = mainImage.AnimalImageId,
+                        ImageUrl = mainImage.ImageUrl,
+                        UploadDate = mainImage.UploadDate,
+                        ImageAlternativeText = mainImage.ImageAlternativeText,
+                        ImageDescription = mainImage.ImageDescription,
+                        IsMainImage = mainImage.IsMainImage,
+                        ImageIsVerified = mainImage.ImageIsVerified,
+                        AnimalId = mainImage.AnimalId
+                    });
+                }
+
+                // Build the animal DTO
+                return new AnimalReadDto
+                {
+                    AnimalId = a.AnimalId,
+                    AnimalName = a.AnimalName,
+                    AnimalAge = a.AnimalAge,
+                    AnimalGender = a.AnimalGender,
+                    AnimalBreed = a.AnimalBreed,
+                    AnimalDescription = a.AnimalDescription,
+                    AnimalStatus = a.AnimalStatus,
+                    AnimalLocation = a.AnimalLocation,
+                    AnimalLatitude = a.AnimalLatitude.HasValue ? (double?)a.AnimalLatitude.Value : null,
+                    AnimalLongitude = a.AnimalLongitude.HasValue ? (double?)a.AnimalLongitude.Value : null,
+                    AnimalTypeKey = a.AnimalTypeKey,
+                    AnimalSizeKey = a.AnimalSizeKey,
+                    UserId = a.UserId,
+                    ShelterId = a.ShelterId,
+                    FosterHomeId = a.FosterHomeId,
+                    AnimalIsVerified = a.AnimalIsVerified,
+                    AdPostedDate = a.AdPostedDate,
+                    AdUpdateDate = a.AdUpdateDate,
+                    Images = images
+                };
             }).ToList();
 
             return animalDtos;
         }
 
+
+
         // Get a single animal by ID
         public async Task<AnimalReadDto> GetAnimalByIdAsync(Guid animalId)
         {
+            // Get the animal by ID
             var a = await _context.Animals.FindAsync(animalId);
             if (a == null) return null;
 
+            // Get all images for this animal
+            var images = await _context.AnimalImages
+                .Where(img => img.AnimalId == animalId)
+                .ToListAsync();
+
+            // Map images to DTOs
+            var imageDtos = images.Select(img => new AnimalImageReadDto
+            {
+                AnimalImageId = img.AnimalImageId,
+                ImageUrl = img.ImageUrl,
+                UploadDate = img.UploadDate,
+                ImageAlternativeText = img.ImageAlternativeText,
+                ImageDescription = img.ImageDescription,
+                IsMainImage = img.IsMainImage,
+                ImageIsVerified = img.ImageIsVerified,
+                AnimalId = img.AnimalId
+            }).ToList();
+
+            // Build and return the animal DTO
             return new AnimalReadDto
             {
                 AnimalId = a.AnimalId,
@@ -78,9 +129,10 @@ namespace PetAdoptionAPI.Services
                 AnimalIsVerified = a.AnimalIsVerified,
                 AdPostedDate = a.AdPostedDate,
                 AdUpdateDate = a.AdUpdateDate,
-                Images = new List<AnimalImageReadDto>()
+                Images = imageDtos // All images for this animal
             };
         }
+
 
         // Create a new animal
         public async Task<AnimalReadDto> CreateAnimalAsync(AnimalCreateDto dto)
