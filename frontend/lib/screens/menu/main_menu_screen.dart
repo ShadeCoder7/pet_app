@@ -11,9 +11,12 @@ class Animal {
 
 // Main menu screen with professional structure
 class MainMenuScreen extends StatelessWidget {
-  final String userName = "Eric"; // Replace with your logic
+  final String userName;
 
-  const MainMenuScreen({Key? key}) : super(key: key);
+  const MainMenuScreen({
+    Key? key,
+    required this.userName, // User name passed from the previous screen
+  }) : super(key: key);
 
   // List of featured animals for demonstration
   List<Animal> get featuredAnimals => [
@@ -204,6 +207,7 @@ class _AnimalCard extends StatelessWidget {
 }
 
 // Bottom navigation bar widget with 5 icon buttons and Spanish tooltips
+// Bottom navigation bar widget with 5 icon buttons and Spanish tooltips
 class _MainMenuNavigationBar extends StatelessWidget {
   const _MainMenuNavigationBar();
 
@@ -221,7 +225,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black,
             blurRadius: 12,
             offset: const Offset(0, -3),
           ),
@@ -230,7 +234,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Button for Favorites screen
+          // Button for Favoritos screen
           IconButton(
             icon: Icon(
               Icons.favorite_outline,
@@ -238,12 +242,12 @@ class _MainMenuNavigationBar extends StatelessWidget {
               size: 30,
             ),
             onPressed: () {
-              _showSnack('Favoritos');
-              // TODO: Navigate to Favorites screen
+              Navigator.pushNamed(context, '/favorites');
             },
             tooltip: 'Favoritos',
           ),
-          // Button for Adoption Requests screen
+
+          // Button for Solicitudes screen
           IconButton(
             icon: Icon(
               Icons.article_outlined,
@@ -251,12 +255,12 @@ class _MainMenuNavigationBar extends StatelessWidget {
               size: 28,
             ),
             onPressed: () {
-              _showSnack('Solicitudes');
-              // TODO: Navigate to Adoption Requests screen
+              Navigator.pushNamed(context, '/requests');
             },
             tooltip: 'Solicitudes',
           ),
-          // Central button for Adopt screen (highlighted)
+
+          // Central button for Adoptar (animal list) screen
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -268,13 +272,13 @@ class _MainMenuNavigationBar extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.pets, color: Colors.white, size: 36),
               onPressed: () {
-                _showSnack('Adoptar');
-                // TODO: Navigate to Adopt (animal list) screen
+                Navigator.pushNamed(context, '/adopt');
               },
               tooltip: 'Adoptar',
             ),
           ),
-          // Button for Reports screen
+
+          // Button for Reportes screen
           IconButton(
             icon: Icon(
               Icons.report_problem_outlined,
@@ -282,12 +286,12 @@ class _MainMenuNavigationBar extends StatelessWidget {
               size: 28,
             ),
             onPressed: () {
-              _showSnack('Reportes');
-              // TODO: Navigate to Reports screen
+              Navigator.pushNamed(context, '/reports');
             },
             tooltip: 'Reportes',
           ),
-          // Button for Profile screen
+
+          // Button for Perfil screen
           IconButton(
             icon: Icon(
               Icons.person_outline,
@@ -295,8 +299,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
               size: 30,
             ),
             onPressed: () {
-              _showSnack('Perfil');
-              // TODO: Navigate to Profile screen
+              Navigator.pushNamed(context, '/profile');
             },
             tooltip: 'Perfil',
           ),
