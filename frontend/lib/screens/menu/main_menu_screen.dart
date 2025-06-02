@@ -1,87 +1,63 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../utils/app_colors.dart';
+import '../../models/animal.dart';
+import '../../models/animal_image.dart';
 
-// Example animal data for the MVP (replace with API data later)
-class Animal {
-  final String name;
-  final String imageUrl;
-
-  Animal({required this.name, required this.imageUrl});
-}
-
-// Main menu screen with professional structure
-class MainMenuScreen extends StatelessWidget {
+class MainMenuScreen extends StatefulWidget {
   final String userName;
 
-  const MainMenuScreen({
-    Key? key,
-    required this.userName, // User name passed from the previous screen
-  }) : super(key: key);
+  const MainMenuScreen({Key? key, required this.userName}) : super(key: key);
 
-  // List of featured animals for demonstration
-  List<Animal> get featuredAnimals => [
-    Animal(
-      name: "Bella",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=7",
-    ),
-    Animal(
-      name: "Coco",
-      imageUrl: "https://loremflickr.com/320/240/cat?lock=8",
-    ),
-    Animal(
-      name: "Nala",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=9",
-    ),
-    Animal(
-      name: "Milo",
-      imageUrl: "https://loremflickr.com/320/240/cat?lock=10",
-    ),
-    Animal(
-      name: "Kira",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=11",
-    ),
-    Animal(
-      name: "Toby",
-      imageUrl: "https://loremflickr.com/320/240/cat?lock=12",
-    ),
-    Animal(
-      name: "Bruno",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=13",
-    ),
-    Animal(
-      name: "Chloe",
-      imageUrl: "https://loremflickr.com/320/240/cat?lock=14",
-    ),
-    Animal(
-      name: "Rocky",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=15",
-    ),
-    Animal(
-      name: "Luna",
-      imageUrl: "https://loremflickr.com/320/240/cat?lock=16",
-    ),
-    Animal(
-      name: "Oliver",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=17",
-    ),
-    Animal(
-      name: "Zoe",
-      imageUrl: "https://loremflickr.com/320/240/cat?lock=18",
-    ),
-  ];
+  @override
+  State<MainMenuScreen> createState() => _MainMenuScreenState();
+}
+
+class _MainMenuScreenState extends State<MainMenuScreen> {
+  List<Animal> _allAnimals = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAnimals();
+  }
+
+  // Fetch all animals from the backend and shuffle for featured selection
+  Future<void> fetchAnimals() async {
+    setState(() => _isLoading = true);
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:7105/api/animal'),
+    );
+
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      List<Animal> animals = data.map((json) => Animal.fromJson(json)).toList();
+      animals.shuffle(Random());
+      setState(() {
+        // Show 4 to 6 animals at random (adjust as needed)
+        _allAnimals = animals.take(6).toList();
+      });
+    } else {
+      // Handle error, show empty list or snackbar if needed
+      setState(() => _allAnimals = []);
+    }
+    setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBlueWhite,
-      // AppBar shows the main menu title and a settings button on the top right
       appBar: AppBar(
-        backgroundColor: AppColors.deepGreen, // Primary color for header
+        backgroundColor: AppColors.deepGreen,
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: const Text(
-          'Menú principal', // Visible text in Spanish for the user
+          'Menú principal',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -93,10 +69,9 @@ class MainMenuScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.settings_outlined, color: Colors.white, size: 28),
             onPressed: () {
-              // Navigate to OptionsMenuScreen
               Navigator.pushNamed(context, '/options');
             },
-            tooltip: 'Ajustes', // Visible tooltip in Spanish
+            tooltip: 'Ajustes',
           ),
         ],
       ),
@@ -114,7 +89,7 @@ class MainMenuScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'Hola, $userName', // Visible text in Spanish
+                  'Hola, ${widget.userName}',
                   style: TextStyle(
                     color: AppColors.deepGreen,
                     fontSize: 21,
@@ -124,12 +99,10 @@ class MainMenuScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Subtle divider below greeting
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 4),
               child: Divider(thickness: 1.3, color: AppColors.softGreen),
             ),
-            // Section header and "Ver todos" button
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
@@ -139,7 +112,7 @@ class MainMenuScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Nuestros Peluditos', // Visible text in Spanish
+                    'Nuestros Peluditos',
                     style: TextStyle(
                       color: AppColors.terracotta,
                       fontSize: 20,
@@ -148,11 +121,10 @@ class MainMenuScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Navegar a la lista de animales, pasando siempre el nombre de usuario
                       Navigator.pushNamed(
                         context,
                         '/animal-list',
-                        arguments: userName,
+                        arguments: widget.userName,
                       );
                     },
                     style: TextButton.styleFrom(
@@ -162,29 +134,32 @@ class MainMenuScreen extends StatelessWidget {
                         fontSize: 15,
                       ),
                     ),
-                    child: const Text('Ver todos'), // Visible text in Spanish
+                    child: const Text('Ver todos'),
                   ),
                 ],
               ),
             ),
-            // Grid of featured animals (2 per row)
+            // Featured animals grid
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 14,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 2,
-                ),
-                childAspectRatio: 0.92,
-                children: featuredAnimals
-                    .map((animal) => _AnimalCard(animal: animal))
-                    .toList(),
-              ),
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : _allAnimals.isEmpty
+                  ? Center(child: Text('No hay animales para mostrar'))
+                  : GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 14,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 2,
+                      ),
+                      childAspectRatio: 0.92,
+                      children: _allAnimals
+                          .map((animal) => _AnimalCard(animal: animal))
+                          .toList(),
+                    ),
             ),
-            // Bottom navigation bar with 5 buttons
-            _MainMenuNavigationBar(userName: userName),
+            _MainMenuNavigationBar(userName: widget.userName),
           ],
         ),
       ),
@@ -192,20 +167,28 @@ class MainMenuScreen extends StatelessWidget {
   }
 }
 
-// Animal card with visual polish and tap effect
+// Animal card with real animal info from API
 class _AnimalCard extends StatelessWidget {
   final Animal animal;
   const _AnimalCard({required this.animal});
 
   @override
   Widget build(BuildContext context) {
+    // Find main image or first image, or null
+    AnimalImage? mainImage = animal.images.isNotEmpty
+        ? (animal.images.firstWhere(
+            (img) => img.isMainImage,
+            orElse: () => animal.images[0],
+          ))
+        : null;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
-          // Navigate to the animal details screen if needed
-          // Example: Navigator.pushNamed(context, '/animal-profile', arguments: animal);
+          // Navigate to animal profile screen
+          Navigator.pushNamed(context, '/animal-profile', arguments: animal);
         },
         splashColor: AppColors.deepGreen,
         child: Card(
@@ -220,22 +203,27 @@ class _AnimalCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Animal photo with placeholder if loading/error
+                // Animal photo with placeholder if not available
                 ClipRRect(
                   borderRadius: BorderRadius.circular(14),
-                  child: Image.network(
-                    animal.imageUrl,
-                    height: 80,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Icon(Icons.pets, size: 56, color: AppColors.deepGreen),
-                  ),
+                  child: mainImage != null
+                      ? Image.network(
+                          mainImage.imageUrl,
+                          height: 80,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.pets,
+                            size: 56,
+                            color: AppColors.deepGreen,
+                          ),
+                        )
+                      : Icon(Icons.pets, size: 56, color: AppColors.deepGreen),
                 ),
                 const SizedBox(height: 12),
                 // Animal name
                 Text(
-                  animal.name, // Visible text in Spanish
+                  animal.animalName,
                   style: TextStyle(
                     color: AppColors.deepGreen,
                     fontWeight: FontWeight.bold,
@@ -252,7 +240,7 @@ class _AnimalCard extends StatelessWidget {
   }
 }
 
-// Bottom navigation bar widget with 5 icon buttons and Spanish tooltips
+// Bottom navigation bar widget (igual que antes)
 class _MainMenuNavigationBar extends StatelessWidget {
   final String userName;
   const _MainMenuNavigationBar({required this.userName});
@@ -275,7 +263,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Button for Favoritos screen
+          // Favoritos button
           IconButton(
             icon: Icon(
               Icons.favorite_outline,
@@ -285,10 +273,9 @@ class _MainMenuNavigationBar extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/favorites');
             },
-            tooltip: 'Favoritos', // Visible tooltip in Spanish
+            tooltip: 'Favoritos',
           ),
-
-          // Button for Solicitudes screen
+          // Solicitudes button
           IconButton(
             icon: Icon(
               Icons.article_outlined,
@@ -298,10 +285,9 @@ class _MainMenuNavigationBar extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/requests');
             },
-            tooltip: 'Solicitudes', // Visible tooltip in Spanish
+            tooltip: 'Solicitudes',
           ),
-
-          // Central button for Adoptar (animal list) screen
+          // Central adopt button
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -313,14 +299,12 @@ class _MainMenuNavigationBar extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.pets, color: Colors.white, size: 36),
               onPressed: () {
-                // ¡Aquí también pásalo si la pantalla lo requiere!
                 Navigator.pushNamed(context, '/adopt', arguments: userName);
               },
-              tooltip: 'Adoptar', // Visible tooltip in Spanish
+              tooltip: 'Adoptar',
             ),
           ),
-
-          // Button for Reportes screen
+          // Reportes button
           IconButton(
             icon: Icon(
               Icons.report_problem_outlined,
@@ -330,10 +314,9 @@ class _MainMenuNavigationBar extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/reports');
             },
-            tooltip: 'Reportes', // Visible tooltip in Spanish
+            tooltip: 'Reportes',
           ),
-
-          // Button for Perfil screen
+          // Perfil button
           IconButton(
             icon: Icon(
               Icons.person_outline,
@@ -343,7 +326,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/public-profile');
             },
-            tooltip: 'Perfil', // Visible tooltip in Spanish
+            tooltip: 'Perfil',
           ),
         ],
       ),
