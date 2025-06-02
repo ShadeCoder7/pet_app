@@ -7,6 +7,8 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/session_check_screen.dart';
 import 'screens/auth/complete_profile_screen.dart';
 import 'screens/menu/main_menu_screen.dart';
+import 'screens/favorites/favorites_menu_screen.dart';
+import 'screens/requests/adopt_menu_screen.dart';
 import 'screens/animal/animal_list_screen.dart';
 import 'screens/animal/animal_profile_screen.dart';
 import 'screens/animal/add_animal_screen.dart';
@@ -20,32 +22,57 @@ class HopePawsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define a map of all named routes and their corresponding builders
+    // Define a map of all named routes and their corresponding builders.
+    // We will override '/main' in onGenerateRoute to extract the 'userName' argument.
     final Map<String, WidgetBuilder> routes = {
-      '/onboarding': (_) => OnboardingScreen(),
-      '/login': (_) => LoginScreen(),
-      '/register': (_) => RegisterScreen(),
-      '/session-check': (_) => SessionCheckScreen(),
-      '/complete-profile': (_) => CompleteProfileScreen(),
-      '/main': (_) => MainMenuScreen(),
-      '/animal-list': (_) => AnimalListScreen(),
-      '/animal-profile': (_) => AnimalProfileScreen(),
-      '/add-animal': (_) => AddAnimalScreen(),
-      '/public-profile': (_) => PublicProfileScreen(),
-      '/options': (_) => OptionsMenuScreen(),
-      '/reports': (_) => ReportsMenuScreen(),
-      '/requests': (_) => RequestsMenuScreen(),
+      '/onboarding': (_) => const OnboardingScreen(),
+      '/login': (_) => const LoginScreen(),
+      '/register': (_) => const RegisterScreen(),
+      '/session-check': (_) => const SessionCheckScreen(),
+      '/complete-profile': (_) => const CompleteProfileScreen(),
+      '/favorites': (_) => const FavoritesMenuScreen(),
+      '/adopt': (_) => const AdoptMenuScreen(),
+      // '/main' will be handled in onGenerateRoute to pass userName
+      '/animal-list': (_) => const AnimalListScreen(),
+      '/animal-profile': (_) => const AnimalProfileScreen(),
+      '/add-animal': (_) => const AddAnimalScreen(),
+      '/public-profile': (_) => const PublicProfileScreen(),
+      '/options': (_) => const OptionsMenuScreen(),
+      '/reports': (_) => const ReportsMenuScreen(),
+      '/requests': (_) => const RequestsMenuScreen(),
     };
 
     return MaterialApp(
       title: 'Hope&Paws',
       debugShowCheckedModeBanner: false,
       initialRoute: '/onboarding',
-      // Remove the `routes:` block and use `onGenerateRoute` to apply a global fade transition
+      // Use onGenerateRoute to apply a global fade transition and handle '/main' dynamically.
       onGenerateRoute: (RouteSettings settings) {
-        final builder = routes[settings.name];
+        final String? routeName = settings.name;
+        WidgetBuilder? builder;
+
+        if (routeName == '/main') {
+          // Extract the userName argument that must have been passed via Navigator.pushNamed
+          final args = settings.arguments;
+          if (args is String) {
+            // If a valid String argument is provided, pass it to MainMenuScreen
+            builder = (_) => MainMenuScreen(userName: args);
+          } else {
+            // If no valid argument is provided, show an error page in Spanish
+            builder = (_) => Scaffold(
+              appBar: AppBar(title: const Text('Error')),
+              body: const Center(
+                child: Text('No se proporcionó el nombre de usuario.'),
+              ),
+            );
+          }
+        } else {
+          // For all other routes, look up the routes map
+          builder = routes[routeName];
+        }
+
         if (builder == null) {
-          // If the route does not exist, display a simple 404 page in Spanish
+          // If the route does not exist, show a 404 page in Spanish
           return MaterialPageRoute(
             builder: (_) => Scaffold(
               appBar: AppBar(title: const Text('Ruta no encontrada')),
@@ -53,11 +80,12 @@ class HopePawsApp extends StatelessWidget {
             ),
           );
         }
+
         // Wrap each screen in a PageRouteBuilder with a FadeTransition
         return PageRouteBuilder(
           settings: settings,
           pageBuilder: (context, animation, secondaryAnimation) =>
-              builder(context),
+              builder!(context),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
