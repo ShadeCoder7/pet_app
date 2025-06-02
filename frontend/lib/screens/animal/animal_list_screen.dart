@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../utils/app_colors.dart';
 import '../../models/animal.dart';
+import '../../models/animal_image.dart';
+import 'animal_profile_screen.dart';
 
 class AnimalListScreen extends StatefulWidget {
   final String userName;
@@ -22,7 +24,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     fetchAnimals();
   }
 
-  // Load all animals in one go for MVP (no pagination)
+  // Fetch all animals from the backend for the MVP (no pagination)
   Future<void> fetchAnimals() async {
     setState(() => isLoading = true);
     final response = await http.get(
@@ -35,9 +37,21 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         animals = data.map((json) => Animal.fromJson(json)).toList();
       });
     } else {
+      // If the request fails, throw an exception (can show a snackbar, too)
       throw Exception('Error cargando animales');
     }
     setState(() => isLoading = false);
+  }
+
+  // Get the main image of the animal, or the first one if none is marked as main, or null if no images
+  AnimalImage? getMainImage(Animal animal) {
+    if (animal.images.isNotEmpty) {
+      return animal.images.firstWhere(
+        (img) => img.isMainImage,
+        orElse: () => animal.images[0],
+      );
+    }
+    return null;
   }
 
   @override
@@ -59,37 +73,49 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : animals.isEmpty
             ? const Center(child: Text('No hay animales para mostrar'))
             : ListView.builder(
                 itemCount: animals.length,
                 itemBuilder: (context, index) {
                   Animal animal = animals[index];
+                  AnimalImage? mainImage = getMainImage(animal);
+
                   return Card(
                     child: ListTile(
-                      // Show image or placeholder if empty
+                      // Show main image if available, or a placeholder
                       leading: CircleAvatar(
-                        backgroundImage: animal.imageUrl.isNotEmpty
-                            ? NetworkImage(animal.imageUrl)
+                        backgroundImage: mainImage != null
+                            ? NetworkImage(mainImage.imageUrl)
                             : const AssetImage(
                                     'assets/images/default_animal.png',
                                   )
                                   as ImageProvider,
                       ),
-                      title: Text(animal.name),
+                      title: Text(animal.animalName),
                       subtitle: Text(
-                        animal.age != null
-                            ? '${animal.breed} - ${animal.age} años'
-                            : animal.breed,
+                        animal.animalAge != null
+                            ? '${animal.animalBreed} - ${animal.animalAge} años'
+                            : animal.animalBreed,
                       ),
-                      trailing: Text(animal.status),
+                      trailing: Text(animal.animalStatus),
+                      // On tap, navigate to the animal's profile, passing the full animal object
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AnimalProfileScreen(animal: animal),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
               ),
       ),
-      // Pasa userName a la barra
+      // Bottom navigation bar for the list screen
       bottomNavigationBar: AnimalListNavigationBar(userName: widget.userName),
     );
   }
@@ -118,7 +144,7 @@ class AnimalListNavigationBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Botón de inicio (izquierda)
+          // Home button
           IconButton(
             icon: Icon(
               Icons.home_outlined,
@@ -130,7 +156,7 @@ class AnimalListNavigationBar extends StatelessWidget {
             },
             tooltip: 'Inicio',
           ),
-          // Botón de búsqueda
+          // Search button
           IconButton(
             icon: Icon(Icons.search, color: AppColors.terracotta, size: 28),
             onPressed: () {
@@ -138,7 +164,7 @@ class AnimalListNavigationBar extends StatelessWidget {
             },
             tooltip: 'Buscar',
           ),
-          // Botón de favoritos (central destacado)
+          // Favorites button (center)
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -155,7 +181,7 @@ class AnimalListNavigationBar extends StatelessWidget {
               tooltip: 'Favoritos',
             ),
           ),
-          // Botón de solicitudes
+          // Requests button
           IconButton(
             icon: Icon(
               Icons.article_outlined,
@@ -167,7 +193,7 @@ class AnimalListNavigationBar extends StatelessWidget {
             },
             tooltip: 'Solicitudes',
           ),
-          // Botón de perfil
+          // Profile button
           IconButton(
             icon: Icon(
               Icons.person_outline,
