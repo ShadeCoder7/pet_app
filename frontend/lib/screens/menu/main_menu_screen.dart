@@ -21,22 +21,52 @@ class MainMenuScreen extends StatelessWidget {
   // List of featured animals for demonstration
   List<Animal> get featuredAnimals => [
     Animal(
-      name: "Luna",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=1",
+      name: "Bella",
+      imageUrl: "https://loremflickr.com/320/240/dog?lock=7",
     ),
-    Animal(name: "Max", imageUrl: "https://loremflickr.com/320/240/cat?lock=2"),
     Animal(
-      name: "Simba",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=3",
+      name: "Coco",
+      imageUrl: "https://loremflickr.com/320/240/cat?lock=8",
     ),
-    Animal(name: "Mia", imageUrl: "https://loremflickr.com/320/240/cat?lock=4"),
+    Animal(
+      name: "Nala",
+      imageUrl: "https://loremflickr.com/320/240/dog?lock=9",
+    ),
+    Animal(
+      name: "Milo",
+      imageUrl: "https://loremflickr.com/320/240/cat?lock=10",
+    ),
+    Animal(
+      name: "Kira",
+      imageUrl: "https://loremflickr.com/320/240/dog?lock=11",
+    ),
+    Animal(
+      name: "Toby",
+      imageUrl: "https://loremflickr.com/320/240/cat?lock=12",
+    ),
+    Animal(
+      name: "Bruno",
+      imageUrl: "https://loremflickr.com/320/240/dog?lock=13",
+    ),
+    Animal(
+      name: "Chloe",
+      imageUrl: "https://loremflickr.com/320/240/cat?lock=14",
+    ),
     Animal(
       name: "Rocky",
-      imageUrl: "https://loremflickr.com/320/240/dog?lock=5",
+      imageUrl: "https://loremflickr.com/320/240/dog?lock=15",
     ),
     Animal(
-      name: "Lola",
-      imageUrl: "https://loremflickr.com/320/240/cat?lock=6",
+      name: "Luna",
+      imageUrl: "https://loremflickr.com/320/240/cat?lock=16",
+    ),
+    Animal(
+      name: "Oliver",
+      imageUrl: "https://loremflickr.com/320/240/dog?lock=17",
+    ),
+    Animal(
+      name: "Zoe",
+      imageUrl: "https://loremflickr.com/320/240/cat?lock=18",
     ),
   ];
 
@@ -44,14 +74,14 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBlueWhite,
-      // AppBar shows the main menu title
+      // AppBar shows the main menu title and a settings button on the top right
       appBar: AppBar(
-        backgroundColor: AppColors.deepGreen,
+        backgroundColor: AppColors.deepGreen, // Primary color for header
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: const Text(
-          'Menú principal',
+          'Menú principal', // Visible text in Spanish for the user
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -59,6 +89,16 @@ class MainMenuScreen extends StatelessWidget {
             letterSpacing: 1.1,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings_outlined, color: Colors.white, size: 28),
+            onPressed: () {
+              // Navigate to OptionsMenuScreen
+              Navigator.pushNamed(context, '/options');
+            },
+            tooltip: 'Ajustes', // Visible tooltip in Spanish
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -74,7 +114,7 @@ class MainMenuScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'Hola, $userName',
+                  'Hola, $userName', // Visible text in Spanish
                   style: TextStyle(
                     color: AppColors.deepGreen,
                     fontSize: 21,
@@ -99,7 +139,7 @@ class MainMenuScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Nuestros Peluditos',
+                    'Nuestros Peluditos', // Visible text in Spanish
                     style: TextStyle(
                       color: AppColors.terracotta,
                       fontSize: 20,
@@ -108,7 +148,8 @@ class MainMenuScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      // TODO: Navigate to the full animal list screen
+                      // Navigate to the full animal list screen
+                      Navigator.pushNamed(context, '/animal-list');
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.deepGreen,
@@ -117,7 +158,7 @@ class MainMenuScreen extends StatelessWidget {
                         fontSize: 15,
                       ),
                     ),
-                    child: const Text('Ver todos'),
+                    child: const Text('Ver todos'), // Visible text in Spanish
                   ),
                 ],
               ),
@@ -159,7 +200,8 @@ class _AnimalCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
-          // TODO: Navigate to the animal details screen if needed
+          // Navigate to the animal details screen if needed
+          // Example: Navigator.pushNamed(context, '/animal-profile', arguments: animal);
         },
         splashColor: AppColors.deepGreen,
         child: Card(
@@ -189,7 +231,7 @@ class _AnimalCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 // Animal name
                 Text(
-                  animal.name,
+                  animal.name, // Visible text in Spanish
                   style: TextStyle(
                     color: AppColors.deepGreen,
                     fontWeight: FontWeight.bold,
@@ -207,17 +249,12 @@ class _AnimalCard extends StatelessWidget {
 }
 
 // Bottom navigation bar widget with 5 icon buttons and Spanish tooltips
-// Bottom navigation bar widget with 5 icon buttons and Spanish tooltips
 class _MainMenuNavigationBar extends StatelessWidget {
   const _MainMenuNavigationBar();
 
   @override
   Widget build(BuildContext context) {
     // Helper function to show a quick feedback message
-    void _showSnack(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), duration: const Duration(seconds: 1)),
-    );
-
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       decoration: BoxDecoration(
@@ -244,7 +281,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/favorites');
             },
-            tooltip: 'Favoritos',
+            tooltip: 'Favoritos', // Visible tooltip in Spanish
           ),
 
           // Button for Solicitudes screen
@@ -257,7 +294,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/requests');
             },
-            tooltip: 'Solicitudes',
+            tooltip: 'Solicitudes', // Visible tooltip in Spanish
           ),
 
           // Central button for Adoptar (animal list) screen
@@ -274,7 +311,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, '/adopt');
               },
-              tooltip: 'Adoptar',
+              tooltip: 'Adoptar', // Visible tooltip in Spanish
             ),
           ),
 
@@ -288,7 +325,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/reports');
             },
-            tooltip: 'Reportes',
+            tooltip: 'Reportes', // Visible tooltip in Spanish
           ),
 
           // Button for Perfil screen
@@ -299,9 +336,9 @@ class _MainMenuNavigationBar extends StatelessWidget {
               size: 30,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/profile');
+              Navigator.pushNamed(context, '/public-profile');
             },
-            tooltip: 'Perfil',
+            tooltip: 'Perfil', // Visible tooltip in Spanish
           ),
         ],
       ),
