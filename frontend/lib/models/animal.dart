@@ -1,21 +1,21 @@
 class Animal {
-  final String animalId; // ID único (UUID)
-  final String animalName; // Nombre del animal
-  final int? animalAge; // Edad (opcional)
-  final String animalGender; // Género (male/female/not_specified)
-  final String animalBreed; // Raza
-  final String animalDescription; // Descripción
-  final String animalStatus; // Estado (available, adopted, etc.)
-  final DateTime adPostedDate; // Fecha publicación anuncio
-  final DateTime adUpdateDate; // Fecha última actualización
-  final String animalLocation; // Localización descriptiva
-  final double? animalLatitude; // Latitud (opcional)
-  final double? animalLongitude; // Longitud (opcional)
-  final bool animalIsVerified; // Verificado por admin (bool)
+  final String animalId; // Unique identifier (UUID)
+  final String animalName; // Name of the animal
+  final int? animalAge; // Age (optional)
+  final String animalGender; // Gender (male/female/not_specified)
+  final String animalBreed; // Breed
+  final String animalDescription; // Description
+  final String animalStatus; // Status (available, adopted, etc.)
+  final DateTime adPostedDate; // Advertisement posted date
+  final DateTime adUpdateDate; // Advertisement last updated date
+  final String animalLocation; // Descriptive location
+  final double? animalLatitude; // Latitude (optional)
+  final double? animalLongitude; // Longitude (optional)
+  final bool animalIsVerified; // Verified by admin (bool)
   final String?
-  animalTypeKey; // Tipo (puedes añadir luego como modelo relacionado)
-  final String animalSizeKey; // Tamaño (clave)
-  final String? mainImageUrl; // URL de la imagen principal
+  animalTypeKey; // Type key (can be linked to related model later)
+  final String animalSizeKey; // Size key
+  final String? mainImageUrl; // URL of the main image
 
   Animal({
     required this.animalId,
@@ -36,7 +36,6 @@ class Animal {
     this.mainImageUrl,
   });
 
-  // Crea un Animal desde un JSON (como el que recibes del backend)
   factory Animal.fromJson(Map<String, dynamic> json) {
     return Animal(
       animalId: json['animalId'],
@@ -58,8 +57,7 @@ class Animal {
       animalIsVerified: json['animalIsVerified'] ?? false,
       animalTypeKey: json['animalTypeKey'],
       animalSizeKey: json['animalSizeKey'],
-      mainImageUrl:
-          json['mainImageUrl'], // Ojo: esto debes añadirlo en el DTO/backend si aún no lo tienes.
+      mainImageUrl: json['mainImageUrl'],
     );
   }
 }
