@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../utils/app_colors.dart';
-import '../../utils/fade_route.dart';
 import 'register_screen.dart';
 import '/screens/auth/session_check_screen.dart';
-import '/screens/menu/main_menu_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -58,9 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (!mounted) return;
       // Use fade transition to navigate to MainMenuScreen
-      Navigator.of(
-        context,
-      ).pushReplacement(createFadeRoute(const MainMenuScreen()));
+      Navigator.pushReplacementNamed(context, '/session-check');
     } on FirebaseAuthException catch (e) {
       setState(() {
         _isLoading = false;
@@ -228,8 +224,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextButton(
                               onPressed: () {
                                 // Use fade transition to go to RegisterScreen
-                                Navigator.of(context).pushReplacement(
-                                  createFadeRoute(const RegisterScreen()),
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/register',
                                 );
                               },
                               child: Text(
