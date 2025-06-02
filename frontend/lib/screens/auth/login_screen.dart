@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http; // Import http to call custom backend
-import 'dart:convert'; // Import convert to decode JSON
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../utils/app_colors.dart';
-import '/screens/menu/main_menu_screen.dart'; // Import MainMenuScreen to navigate after login
+import '/screens/menu/main_menu_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -16,129 +16,118 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  bool _isLoading = false;
-  String? _errorMessage;
+  bool isLoading = false;
+  String? errorMessage;
 
   // Shows the error message and hides it after 3 seconds
-  void _showErrorMessage(String message) {
+  void showErrorMessage(String message) {
     setState(() {
-      _errorMessage = message;
+      errorMessage = message;
     });
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && _errorMessage == message) {
+      if (mounted && errorMessage == message) {
         setState(() {
-          _errorMessage = null;
+          errorMessage = null;
         });
       }
     });
   }
 
-  /// Method to fetch the user’s first name from your backend,
-  /// using the same route as SessionCheckScreen: GET /api/user/firebase/{uid}
-  Future<String?> _fetchUserNameFromBackend(String uid) async {
-    // NOTE: On the Android emulator, “localhost” does not work;
-    // so we use “10.0.2.2” to point to the host machine.
+  /// Fetch the user’s first name from your backend,
+  /// using: GET /api/user/firebase/{uid}
+  Future<String?> fetchUserFirstNameFromBackend(String uid) async {
     final Uri url = Uri.parse('http://10.0.2.2:7105/api/user/firebase/$uid');
 
     try {
       final http.Response response = await http.get(url);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-
-        // Your backend returns “userFirstName”
         final String? firstName = data['userFirstName'] as String?;
-        // We ignore lastName now, because we only want to show firstName
         if (firstName != null && firstName.isNotEmpty) {
           return firstName;
         }
-        // If “userFirstName” does not exist or is empty, consider profile incomplete
         return null;
       } else if (response.statusCode == 404) {
-        // The endpoint did not find a record with that UID.
         return null;
       } else {
-        // Any other server error.
         return null;
       }
     } catch (e) {
-      // Network error or JSON parsing error; return null to force profile completion.
       return null;
     }
   }
 
-  // Method to handle login using Firebase Auth
-  Future<void> _login() async {
+  // Handles login using Firebase Auth
+  Future<void> login() async {
     setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+      isLoading = true;
+      errorMessage = null;
     });
 
     // Basic validation before calling Firebase
     if (emailController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty) {
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
-      _showErrorMessage("Los campos no pueden estar vacíos.");
+      showErrorMessage("Los campos no pueden estar vacíos.");
       return;
     }
 
     try {
-      // Sign in with email and password using Firebase Auth
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
             email: emailController.text.trim(),
             password: passwordController.text.trim(),
           );
 
-      // Get the currently signed-in user
       final User? user = userCredential.user;
       if (user == null) {
         setState(() {
-          _isLoading = false;
+          isLoading = false;
         });
-        _showErrorMessage("No se pudo obtener la información del usuario.");
+        showErrorMessage("No se pudo obtener la información del usuario.");
         return;
       }
 
-      // Fetch user's name from custom backend using UID
-      final String? nombreUsuario = await _fetchUserNameFromBackend(user.uid);
+      // Print the Firebase ID Token (for Postman usage)
+      final idToken = await user.getIdToken();
+
+      // Fetch user's first name from backend using UID
+      final String? userFirstName = await fetchUserFirstNameFromBackend(
+        user.uid,
+      );
 
       if (!mounted) return;
 
-      if (nombreUsuario == null || nombreUsuario.isEmpty) {
-        // If name is not in backend, redirect to CompleteProfileScreen
+      if (userFirstName == null || userFirstName.isEmpty) {
         Navigator.pushReplacementNamed(context, '/complete-profile');
       } else {
-        // Navigate to MainMenuScreen, passing the fetched userName
         Navigator.pushReplacementNamed(
           context,
           '/main',
-          arguments: nombreUsuario,
+          arguments: userFirstName,
         );
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
-      // Custom messages for common Firebase errors
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-        _showErrorMessage("Email o contraseña incorrectos.");
+        showErrorMessage("Email o contraseña incorrectos.");
       } else if (e.code == 'invalid-email') {
-        _showErrorMessage("El email introducido no tiene un formato válido.");
+        showErrorMessage("El email introducido no tiene un formato válido.");
       } else {
-        _showErrorMessage(
-          "Ha fallado el inicio de sesión. Inténtalo de nuevo.",
-        );
+        showErrorMessage("Ha fallado el inicio de sesión. Inténtalo de nuevo.");
       }
     } catch (e) {
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
-      _showErrorMessage("Ocurrió un error inesperado. Inténtalo de nuevo.");
+      showErrorMessage("Ocurrió un error inesperado. Inténtalo de nuevo.");
     } finally {
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
     }
   }
@@ -245,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: _isLoading ? null : _login,
+                              onPressed: isLoading ? null : login,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.deepGreen,
                                 shape: RoundedRectangleBorder(
@@ -256,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 elevation: 5,
                               ),
-                              child: _isLoading
+                              child: isLoading
                                   ? CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                         AppColors.softGreen,
@@ -303,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                         // Display error message if any
-                        if (_errorMessage != null) ...[
+                        if (errorMessage != null) ...[
                           const SizedBox(height: 16),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -331,7 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      _errorMessage!,
+                                      errorMessage!,
                                       style: TextStyle(
                                         color: AppColors.terracotta,
                                         fontWeight: FontWeight.bold,
