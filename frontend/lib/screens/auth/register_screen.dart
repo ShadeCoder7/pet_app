@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../utils/app_colors.dart';
-import '../../utils/fade_route.dart'; // Import fade transition helper
 import 'login_screen.dart'; // Import LoginScreen widget
 
 class RegisterScreen extends StatefulWidget {
@@ -86,10 +85,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: password,
       );
       if (!mounted) return;
-      // Navigate to LoginScreen with fade transition
-      Navigator.of(
-        context,
-      ).pushReplacement(createFadeRoute(const LoginScreen()));
+      // Navigate to Session Check Screen with fade transition
+      Navigator.pushReplacementNamed(context, '/session-check');
     } on FirebaseAuthException catch (e) {
       setState(() {
         _isLoading = false;
@@ -273,8 +270,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             TextButton(
                               onPressed: () {
                                 // Fade transition to LoginScreen
-                                Navigator.of(context).pushReplacement(
-                                  createFadeRoute(const LoginScreen()),
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/login',
                                 );
                               },
                               child: Text(
