@@ -1,72 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../utils/app_colors.dart';
+import '../../models/animal.dart';
 
-class AnimalListScreen extends StatelessWidget {
+class AnimalListScreen extends StatefulWidget {
   const AnimalListScreen({Key? key}) : super(key: key);
+
+  @override
+  _AnimalListScreenState createState() => _AnimalListScreenState();
+}
+
+class _AnimalListScreenState extends State<AnimalListScreen> {
+  List<Animal> animals = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAnimals();
+  }
+
+  // Load all animals in one go for MVP (no pagination)
+  Future<void> fetchAnimals() async {
+    setState(() => isLoading = true);
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:7105/api/animal'),
+    );
+
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      setState(() {
+        animals = data.map((json) => Animal.fromJson(json)).toList();
+      });
+    } else {
+      throw Exception('Error cargando animales');
+    }
+    setState(() => isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.lightBlueWhite, // Use consistent background color
+      backgroundColor: AppColors.lightBlueWhite,
       appBar: AppBar(
-        backgroundColor: AppColors.deepGreen, // Primary color for header
-        elevation: 0,
+        backgroundColor: AppColors.deepGreen,
         centerTitle: true,
         title: const Text(
-          'Listado de Animales', // Visible text in Spanish for the user
+          'Listado de Animales',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
             fontSize: 24,
-            letterSpacing: 1.05,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Secondary heading
-              Text(
-                'Nuestros Peluditos Disponibles', // Visible text in Spanish for the user
-                style: TextStyle(
-                  color: AppColors.terracotta,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Placeholder content when no animals are loaded yet
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.pets_outlined,
-                        color: AppColors.terracotta,
-                        size: 80,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : animals.isEmpty
+            ? const Center(child: Text('No hay animales para mostrar'))
+            : ListView.builder(
+                itemCount: animals.length,
+                itemBuilder: (context, index) {
+                  Animal animal = animals[index];
+                  return Card(
+                    child: ListTile(
+                      // Show image or placeholder if empty
+                      leading: CircleAvatar(
+                        backgroundImage: animal.imageUrl.isNotEmpty
+                            ? NetworkImage(animal.imageUrl)
+                            : const AssetImage(
+                                    'assets/images/default_animal.png',
+                                  )
+                                  as ImageProvider,
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Cargando lista de animales...', // Visible text in Spanish
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.deepGreen,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                      title: Text(animal.name),
+                      subtitle: Text('${animal.breed} - ${animal.gender}'),
+                      trailing: Text(animal.status),
+                    ),
+                  );
+                },
               ),
-              // (Later: replace placeholder with ListView or GridView of AnimalCards)
-            ],
-          ),
-        ),
       ),
     );
   }
