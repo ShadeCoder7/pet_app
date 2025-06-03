@@ -121,14 +121,10 @@ class OptionsMenuScreen extends StatelessWidget {
                       icon: Icons.notifications,
                       label: 'Notificaciones',
                       onTap: () {
-                        // Navegar a configuración de notificaciones
+                        Navigator.pushNamed(context, '/notifications');
                       },
                     ),
-                    const Divider(
-                      height: 1,
-                      indent: 24,
-                      endIndent: 24,
-                    ), // <-- Línea separadora aquí
+                    const Divider(height: 1, indent: 24, endIndent: 24),
                     _buildMenuItem(
                       context,
                       icon: Icons.info_outline,
