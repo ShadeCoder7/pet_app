@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart'; // FirebaseAuth for logout an
 import '../../utils/app_colors.dart';
 
 class OptionsMenuScreen extends StatelessWidget {
-  const OptionsMenuScreen({Key? key}) : super(key: key);
+  const OptionsMenuScreen({super.key});
 
   void _showAboutDialog(BuildContext context) {
     showAboutDialog(
@@ -88,13 +88,13 @@ class OptionsMenuScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
+                      color: Colors.black.withAlpha((0.07 * 255).round()),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
                   ],
                   border: Border.all(
-                    color: AppColors.deepGreen.withOpacity(0.2),
+                    color: AppColors.deepGreen.withAlpha((0.2 * 255).round()),
                     width: 1.1,
                   ),
                 ),
@@ -158,9 +158,9 @@ class OptionsMenuScreen extends StatelessWidget {
                               TextButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
+                                  final navigator = Navigator.of(context);
                                   await FirebaseAuth.instance.signOut();
-                                  Navigator.pushNamedAndRemoveUntil(
-                                    context,
+                                  navigator.pushNamedAndRemoveUntil(
                                     '/login',
                                     (route) => false,
                                   );
@@ -188,13 +188,13 @@ class OptionsMenuScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
+                      color: Colors.black.withAlpha((0.07 * 255).round()),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
                   ],
                   border: Border.all(
-                    color: AppColors.terracotta.withOpacity(0.4),
+                    color: AppColors.terracotta.withAlpha((0.4 * 255).round()),
                     width: 1.2,
                   ),
                 ),
@@ -220,16 +220,19 @@ class OptionsMenuScreen extends StatelessWidget {
                           TextButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
+                              final navigator = Navigator.of(context);
+                              final scaffoldMessenger = ScaffoldMessenger.of(
+                                context,
+                              );
                               try {
                                 await FirebaseAuth.instance.currentUser
                                     ?.delete();
-                                Navigator.pushNamedAndRemoveUntil(
-                                  context,
+                                navigator.pushNamedAndRemoveUntil(
                                   '/login',
                                   (route) => false,
                                 );
                               } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                scaffoldMessenger.showSnackBar(
                                   const SnackBar(
                                     content: Text(
                                       'No se pudo eliminar la cuenta.',
