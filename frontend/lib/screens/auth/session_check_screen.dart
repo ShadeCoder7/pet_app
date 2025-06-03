@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class SessionCheckScreen extends StatefulWidget {
-  const SessionCheckScreen({Key? key}) : super(key: key);
+  const SessionCheckScreen({super.key});
 
   @override
   State<SessionCheckScreen> createState() => _SessionCheckScreenState();
