@@ -6,7 +6,7 @@ import '../../utils/app_colors.dart';
 class AnimalProfileScreen extends StatelessWidget {
   final Animal animal;
 
-  const AnimalProfileScreen({Key? key, required this.animal}) : super(key: key);
+  const AnimalProfileScreen({super.key, required this.animal});
 
   String _translateValue(String key, Map<String, String> translations) {
     return translations[key.toLowerCase()] ?? key;
@@ -23,13 +23,13 @@ class AnimalProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withAlpha((0.07 * 255).round()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
         border: Border.all(
-          color: AppColors.deepGreen.withOpacity(0.2),
+          color: AppColors.deepGreen.withAlpha((0.2 * 255).round()),
           width: 1.1,
         ),
       ),
