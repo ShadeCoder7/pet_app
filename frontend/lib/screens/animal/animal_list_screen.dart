@@ -6,6 +6,37 @@ import '../../models/animal.dart';
 import '../../models/animal_image.dart';
 import 'animal_profile_screen.dart';
 
+Map<String, dynamic> getStatusStyle(String? status) {
+  switch (status) {
+    case 'available':
+      return {
+        'label': 'Disponible',
+        'color': AppColors.deepGreen, // Verde (defínelo en tu app_colors.dart)
+      };
+    case 'not_available':
+      return {'label': 'No disponible', 'color': Colors.red}; // Rojo
+    case 'adopted':
+      return {
+        'label': 'Adoptado',
+        'color':
+            Colors.blue, // Puedes personalizar el color si tienes uno especial
+      };
+    case 'fostered':
+      return {
+        'label': 'En acogida',
+        'color':
+            AppColors.terracotta, // Puedes poner un naranja suave de tu paleta
+      };
+    case 'in_shelter':
+      return {
+        'label': 'En refugio',
+        'color': AppColors.softGreen, // Un verde oscuro, o el que tú quieras
+      };
+    default:
+      return {'label': 'Desconocido', 'color': Colors.grey};
+  }
+}
+
 class AnimalListScreen extends StatefulWidget {
   final String userName;
   const AnimalListScreen({Key? key, required this.userName}) : super(key: key);
@@ -24,7 +55,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     fetchAnimals();
   }
 
-  // Fetch all animals from the backend for the MVP (no pagination)
+  // Fetch all animals from backend for the MVP (no pagination)
   Future<void> fetchAnimals() async {
     setState(() => isLoading = true);
     final response = await http.get(
@@ -37,13 +68,14 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         animals = data.map((json) => Animal.fromJson(json)).toList();
       });
     } else {
-      // If the request fails, throw an exception (can show a snackbar, too)
-      throw Exception('Error cargando animales');
+      setState(() {
+        animals = [];
+      });
     }
     setState(() => isLoading = false);
   }
 
-  // Get the main image of the animal, or the first one if none is marked as main, or null if no images
+  // Returns the main image of the animal, or the first one if none is marked as main
   AnimalImage? getMainImage(Animal animal) {
     if (animal.images.isNotEmpty) {
       return animal.images.firstWhere(
@@ -54,15 +86,126 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
     return null;
   }
 
+  Widget _buildAnimalCard(Animal animal) {
+    AnimalImage? mainImage = getMainImage(animal);
+    final statusInfo = getStatusStyle(animal.animalStatus);
+
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: Colors.white,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AnimalProfileScreen(animal: animal),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Circular photo with green border (just like main_menu_screen)
+              Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.softGreen, width: 3),
+                ),
+                child: CircleAvatar(
+                  radius: 31,
+                  backgroundColor: AppColors.softGreen,
+                  backgroundImage: mainImage != null
+                      ? NetworkImage(mainImage.imageUrl)
+                      : const AssetImage('assets/images/default_animal.png')
+                            as ImageProvider,
+                ),
+              ),
+              const SizedBox(width: 18),
+              // Animal details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nombre en verde, grande y negrita
+                    Text(
+                      animal.animalName,
+                      style: const TextStyle(
+                        color: AppColors.deepGreen,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    // Raza y edad en terracota, negrita (igual que main_menu_screen)
+                    Row(
+                      children: [
+                        Text(
+                          animal.animalBreed,
+                          style: TextStyle(
+                            color: AppColors.terracotta,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (animal.animalAge != null) ...[
+                          const SizedBox(width: 10),
+                          Text(
+                            '- ${animal.animalAge} años',
+                            style: TextStyle(
+                              color: AppColors.terracotta,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 9),
+                    // Status chip (box) with color and text depending on status
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusInfo['color'],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        statusInfo['label'],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBlueWhite,
+      backgroundColor: AppColors.lightBlueWhite, // Main app background
       appBar: AppBar(
-        backgroundColor: AppColors.deepGreen,
+        backgroundColor: AppColors.terracotta,
         centerTitle: true,
         title: const Text(
-          'Listado de Animales',
+          'Nuestros Peluditos',
           style: TextStyle(
             color: Colors.white,
             fontSize: 24,
@@ -71,57 +214,33 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(14.0),
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : animals.isEmpty
-            ? const Center(child: Text('No hay animales para mostrar'))
+            ? Center(
+                child: Text(
+                  'No hay animales para mostrar',
+                  style: TextStyle(
+                    color: AppColors.terracotta,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
             : ListView.builder(
                 itemCount: animals.length,
-                itemBuilder: (context, index) {
-                  Animal animal = animals[index];
-                  AnimalImage? mainImage = getMainImage(animal);
-
-                  return Card(
-                    child: ListTile(
-                      // Show main image if available, or a placeholder
-                      leading: CircleAvatar(
-                        backgroundImage: mainImage != null
-                            ? NetworkImage(mainImage.imageUrl)
-                            : const AssetImage(
-                                    'assets/images/default_animal.png',
-                                  )
-                                  as ImageProvider,
-                      ),
-                      title: Text(animal.animalName),
-                      subtitle: Text(
-                        animal.animalAge != null
-                            ? '${animal.animalBreed} - ${animal.animalAge} años'
-                            : animal.animalBreed,
-                      ),
-                      trailing: Text(animal.animalStatus),
-                      // On tap, navigate to the animal's profile, passing the full animal object
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                AnimalProfileScreen(animal: animal),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
+                itemBuilder: (context, index) =>
+                    _buildAnimalCard(animals[index]),
               ),
       ),
-      // Bottom navigation bar for the list screen
+      // Navigation bar with the same style as other screens
       bottomNavigationBar: AnimalListNavigationBar(userName: widget.userName),
     );
   }
 }
 
-// Bottom navigation bar with 5 buttons: Favoritos (center), Inicio, Buscar, Solicitudes, Perfil
+// Bottom navigation bar (same style as main menu)
 class AnimalListNavigationBar extends StatelessWidget {
   final String userName;
   const AnimalListNavigationBar({required this.userName});
@@ -129,15 +248,15 @@ class AnimalListNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            blurRadius: 12,
-            offset: const Offset(0, -3),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 16,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
@@ -149,7 +268,7 @@ class AnimalListNavigationBar extends StatelessWidget {
             icon: Icon(
               Icons.home_outlined,
               color: AppColors.deepGreen,
-              size: 28,
+              size: 32,
             ),
             onPressed: () {
               Navigator.pushNamed(context, '/main', arguments: userName);
@@ -158,23 +277,27 @@ class AnimalListNavigationBar extends StatelessWidget {
           ),
           // Search button
           IconButton(
-            icon: Icon(Icons.search, color: AppColors.terracotta, size: 28),
+            icon: Icon(Icons.search, color: AppColors.terracotta, size: 32),
             onPressed: () {
-              Navigator.pushNamed(context, '/buscar');
+              Navigator.pushNamed(
+                context,
+                '/search-animal',
+                arguments: userName,
+              );
             },
             tooltip: 'Buscar',
           ),
-          // Favorites button (center)
+          // Favorites (central)
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.softGreen,
               boxShadow: [
-                BoxShadow(color: AppColors.deepGreen, blurRadius: 10),
+                BoxShadow(color: AppColors.deepGreen, blurRadius: 14),
               ],
             ),
             child: IconButton(
-              icon: Icon(Icons.favorite, color: Colors.white, size: 36),
+              icon: Icon(Icons.favorite, color: Colors.white, size: 40),
               onPressed: () {
                 Navigator.pushNamed(context, '/favorites');
               },
@@ -186,10 +309,10 @@ class AnimalListNavigationBar extends StatelessWidget {
             icon: Icon(
               Icons.article_outlined,
               color: AppColors.deepGreen,
-              size: 28,
+              size: 32,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/requests');
+              Navigator.pushNamed(context, '/requests', arguments: userName);
             },
             tooltip: 'Solicitudes',
           ),
@@ -198,7 +321,7 @@ class AnimalListNavigationBar extends StatelessWidget {
             icon: Icon(
               Icons.person_outline,
               color: AppColors.terracotta,
-              size: 28,
+              size: 34,
             ),
             onPressed: () {
               Navigator.pushNamed(context, '/public-profile');
