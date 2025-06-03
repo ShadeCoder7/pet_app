@@ -3,11 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../utils/app_colors.dart';
-import '/screens/menu/main_menu_screen.dart';
+import 'dart:developer' as developer;
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
-
+  const LoginScreen({super.key});
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -33,25 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  /// Fetch the user’s first name from your backend,
-  /// using: GET /api/user/firebase/{uid}
-  Future<String?> fetchUserFirstNameFromBackend(String uid) async {
+  /// Fetch the user's full object from the backend (by Firebase UID)
+  Future<Map<String, dynamic>?> fetchUserFromBackend(String uid) async {
     final Uri url = Uri.parse('http://10.0.2.2:7105/api/user/firebase/$uid');
-
     try {
       final http.Response response = await http.get(url);
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final String? firstName = data['userFirstName'] as String?;
-        if (firstName != null && firstName.isNotEmpty) {
-          return firstName;
-        }
-        return null;
-      } else if (response.statusCode == 404) {
-        return null;
-      } else {
-        return null;
+        return json.decode(response.body) as Map<String, dynamic>;
       }
+      return null;
     } catch (e) {
       return null;
     }
@@ -75,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
+      // Sign in with Firebase Auth
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
             email: emailController.text.trim(),
@@ -90,24 +80,34 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // Print the Firebase ID Token (for Postman usage)
+      // Get Firebase ID token for authenticated user
       final idToken = await user.getIdToken();
-      print("Firebase ID Token: $idToken");
+      developer.log("User UID: ${user.uid}");
+      developer.log("Firebase ID Token: $idToken");
 
-      // Fetch user's first name from backend using UID
-      final String? userFirstName = await fetchUserFirstNameFromBackend(
-        user.uid,
-      );
+      // Fetch user's full data from backend using Firebase UID
+      final userMap = await fetchUserFromBackend(user.uid);
 
       if (!mounted) return;
 
-      if (userFirstName == null || userFirstName.isEmpty) {
+      if (userMap == null ||
+          userMap['userFirstName'] == null ||
+          userMap['userFirstName'].isEmpty) {
         Navigator.pushReplacementNamed(context, '/complete-profile');
       } else {
+        final String userFirstName = userMap['userFirstName'];
+        final String userGuid =
+            userMap['userId']; // <-- THIS is the GUID you need
+
+        // Now pass userName, userId (GUID), and bearerToken to the main menu
         Navigator.pushReplacementNamed(
           context,
           '/main',
-          arguments: userFirstName,
+          arguments: {
+            'userName': userFirstName, // Display name for the user
+            'userId': userGuid, // GUID from backend (NOT Firebase UID)
+            'bearerToken': idToken, // ID token for backend requests
+          },
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const SizedBox(height: 24),
-                        // Motivational phrase
+                        // Motivational phrase for users
                         Text(
                           "Cada huella cuenta.",
                           textAlign: TextAlign.center,
