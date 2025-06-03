@@ -92,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Print the Firebase ID Token (for Postman usage)
       final idToken = await user.getIdToken();
+      print("Firebase ID Token: $idToken");
 
       // Fetch user's first name from backend using UID
       final String? userFirstName = await fetchUserFirstNameFromBackend(
