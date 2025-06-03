@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../utils/app_colors.dart';
-import 'dart:developer' as developer;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -82,8 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Get Firebase ID token for authenticated user
       final idToken = await user.getIdToken();
-      developer.log("User UID: ${user.uid}");
-      developer.log("Firebase ID Token: $idToken");
 
       // Fetch user's full data from backend using Firebase UID
       final userMap = await fetchUserFromBackend(user.uid);
