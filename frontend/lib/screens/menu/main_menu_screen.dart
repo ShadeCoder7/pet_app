@@ -5,6 +5,9 @@ import 'dart:convert';
 import '../../utils/app_colors.dart';
 import '../../models/animal.dart';
 import '../../models/animal_image.dart';
+import '../../services/user_service.dart';
+import '../../services/animal_service.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 class MainMenuScreen extends StatefulWidget {
   final String userName;
@@ -25,7 +28,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     fetchAnimals();
   }
 
-  // Fetch all animals from the backend and shuffle for featured selection
+  // Fetch animal list from backend
   Future<void> fetchAnimals() async {
     setState(() => _isLoading = true);
     final response = await http.get(
@@ -37,11 +40,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       List<Animal> animals = data.map((json) => Animal.fromJson(json)).toList();
       animals.shuffle(Random());
       setState(() {
-        // Show 4 to 6 animals at random (adjust as needed)
         _allAnimals = animals.take(6).toList();
       });
     } else {
-      // Handle error, show empty list or snackbar if needed
       setState(() => _allAnimals = []);
     }
     setState(() => _isLoading = false);
@@ -50,7 +51,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBlueWhite,
+      backgroundColor: AppColors.lightBlueWhite, // Consistent app background
       appBar: AppBar(
         backgroundColor: AppColors.deepGreen,
         elevation: 0,
@@ -61,7 +62,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 26,
+            fontSize: 25,
             letterSpacing: 1.1,
           ),
         ),
@@ -75,164 +76,241 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // User greeting below the AppBar
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 22,
-                left: 24,
-                right: 24,
-                bottom: 2,
-              ),
-              child: Center(
-                child: Text(
-                  'Hola, ${widget.userName}',
-                  style: TextStyle(
-                    color: AppColors.deepGreen,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w500,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Welcome card with icon
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 410),
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.deepGreen.withOpacity(0.11),
+                    blurRadius: 14,
+                    offset: Offset(0, 4),
                   ),
-                  textAlign: TextAlign.center,
+                ],
+                border: Border.all(
+                  color: AppColors.softGreen.withOpacity(0.35),
+                  width: 1.0,
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 4),
-              child: Divider(thickness: 1.3, color: AppColors.softGreen),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 6,
-              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(
+                    Icons.waving_hand_outlined,
+                    color: AppColors.terracotta,
+                    size: 32,
+                  ),
+                  const SizedBox(width: 10),
                   Text(
-                    'Nuestros Peluditos',
+                    '¡Hola!',
                     style: TextStyle(
                       color: AppColors.terracotta,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 21,
+                      letterSpacing: 0.3,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/animal-list',
-                        arguments: widget.userName,
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.deepGreen,
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                  const SizedBox(width: 9),
+                  Text(
+                    widget.userName,
+                    style: TextStyle(
+                      color: AppColors.deepGreen,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      letterSpacing: 0.3,
                     ),
-                    child: const Text('Ver todos'),
                   ),
                 ],
               ),
             ),
-            // Featured animals grid
-            Expanded(
-              child: _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : _allAnimals.isEmpty
-                  ? Center(child: Text('No hay animales para mostrar'))
-                  : GridView.count(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 14,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 2,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 6),
+          ),
+          // "Nuestros Peluditos" header with paw icon and all-animals button
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.pets, color: AppColors.terracotta, size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Nuestros Peluditos',
+                      style: TextStyle(
+                        color: AppColors.terracotta,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.4,
                       ),
-                      childAspectRatio: 0.92,
-                      children: _allAnimals
-                          .map((animal) => _AnimalCard(animal: animal))
-                          .toList(),
                     ),
+                  ],
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/animal-list',
+                      arguments: widget.userName,
+                    );
+                  },
+                  icon: Icon(Icons.chevron_right, color: AppColors.deepGreen),
+                  label: Text(
+                    'Ver todos',
+                    style: TextStyle(
+                      color: AppColors.deepGreen,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.5,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.deepGreen,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            _MainMenuNavigationBar(userName: widget.userName),
-          ],
-        ),
+          ),
+          // Animal list (with shimmer loading or empty)
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _allAnimals.isEmpty
+                ? Center(
+                    child: Text(
+                      'No hay animales para mostrar',
+                      style: TextStyle(
+                        color: AppColors.terracotta,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 10,
+                    ),
+                    itemCount: _allAnimals.length,
+                    itemBuilder: (context, index) {
+                      final animal = _allAnimals[index];
+                      return _AnimalCard(animal: animal);
+                    },
+                  ),
+          ),
+          _MainMenuNavigationBar(userName: widget.userName),
+        ],
       ),
     );
   }
 }
 
-// Animal card with real animal info from API
 class _AnimalCard extends StatelessWidget {
   final Animal animal;
   const _AnimalCard({required this.animal});
 
   @override
   Widget build(BuildContext context) {
-    // Find main image or first image, or null
     AnimalImage? mainImage = animal.images.isNotEmpty
-        ? (animal.images.firstWhere(
+        ? animal.images.firstWhere(
             (img) => img.isMainImage,
             orElse: () => animal.images[0],
-          ))
+          )
         : null;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: () {
-          // Navigate to animal profile screen
-          Navigator.pushNamed(context, '/animal-profile', arguments: animal);
-        },
-        splashColor: AppColors.deepGreen,
-        child: Card(
-          elevation: 5,
-          shadowColor: AppColors.deepGreen,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          color: AppColors.softGreen,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Animal photo with placeholder if not available
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: mainImage != null
-                      ? Image.network(
-                          mainImage.imageUrl,
-                          height: 80,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.pets,
-                            size: 56,
-                            color: AppColors.deepGreen,
-                          ),
-                        )
-                      : Icon(Icons.pets, size: 56, color: AppColors.deepGreen),
-                ),
-                const SizedBox(height: 12),
-                // Animal name
-                Text(
-                  animal.animalName,
-                  style: TextStyle(
-                    color: AppColors.deepGreen,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+    // Use the first image as main if no main image is set
+    return GestureDetector(
+      onTap: () =>
+          Navigator.pushNamed(context, '/animal-profile', arguments: animal),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 180),
+        curve: Curves.easeInOut,
+        margin: const EdgeInsets.symmetric(vertical: 9, horizontal: 18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(21),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.deepGreen.withOpacity(0.13),
+              blurRadius: 16,
+              offset: Offset(0, 5),
             ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Animal image with border
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.softGreen, width: 3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.deepGreen.withOpacity(0.15),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 33,
+                  backgroundColor: Colors.white,
+                  backgroundImage: mainImage != null
+                      ? NetworkImage(mainImage.imageUrl)
+                      : const AssetImage('assets/images/default_animal.png')
+                            as ImageProvider,
+                ),
+              ),
+              const SizedBox(width: 18),
+              // Animal details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      animal.animalName,
+                      style: TextStyle(
+                        color: AppColors.deepGreen,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 19,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      animal.animalAge != null
+                          ? '${animal.animalBreed} - ${animal.animalAge} ${animal.animalAge == 1 ? 'año' : 'años'}'
+                          : animal.animalBreed,
+                      style: TextStyle(
+                        color: AppColors.terracotta,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -240,7 +318,6 @@ class _AnimalCard extends StatelessWidget {
   }
 }
 
-// Bottom navigation bar widget (igual que antes)
 class _MainMenuNavigationBar extends StatelessWidget {
   final String userName;
   const _MainMenuNavigationBar({required this.userName});
@@ -248,84 +325,115 @@ class _MainMenuNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            blurRadius: 12,
-            offset: const Offset(0, -3),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 16,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Favoritos button
           IconButton(
             icon: Icon(
               Icons.favorite_outline,
               color: AppColors.terracotta,
-              size: 30,
+              size: 34,
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/favorites');
-            },
+            onPressed: () => Navigator.pushNamed(context, '/favorites'),
             tooltip: 'Favoritos',
           ),
-          // Solicitudes button
           IconButton(
             icon: Icon(
               Icons.article_outlined,
               color: AppColors.deepGreen,
-              size: 28,
+              size: 32,
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/requests');
-            },
+            onPressed: () =>
+                Navigator.pushNamed(context, '/requests', arguments: userName),
             tooltip: 'Solicitudes',
           ),
-          // Central adopt button
+          // Botón ADOPTAR modificado:
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.softGreen,
               boxShadow: [
-                BoxShadow(color: AppColors.deepGreen, blurRadius: 10),
+                BoxShadow(color: AppColors.deepGreen, blurRadius: 14),
               ],
             ),
             child: IconButton(
-              icon: Icon(Icons.pets, color: Colors.white, size: 36),
-              onPressed: () {
-                Navigator.pushNamed(context, '/adopt', arguments: userName);
-              },
+              icon: Icon(Icons.pets, color: Colors.white, size: 40),
               tooltip: 'Adoptar',
+              onPressed: () async {
+                // Step 1: Get Firebase user and token
+                final fb_auth.User? firebaseUser =
+                    fb_auth.FirebaseAuth.instance.currentUser;
+                if (firebaseUser == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Debes iniciar sesión para adoptar.'),
+                    ),
+                  );
+                  return;
+                }
+                final String firebaseUid = firebaseUser.uid;
+                final String bearerToken =
+                    await firebaseUser.getIdToken() ?? '';
+
+                // Step 2: Get userId from backend using Firebase UID
+                final userApi = await UserService.fetchUserByFirebaseUid(
+                  firebaseUid,
+                );
+                if (userApi == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('No se pudo obtener tu usuario.')),
+                  );
+                  return;
+                }
+                final userId =
+                    userApi.userId; // Ajusta si tu modelo tiene otro campo
+
+                // Step 3: Get adoptable animals (fetchRandomAnimals trae N aleatorios, puedes cambiar el número)
+                final adoptableAnimals = await AnimalService.fetchRandomAnimals(
+                  count: 20,
+                );
+
+                // Step 4: Go to adoption request screen with all required arguments
+                Navigator.pushNamed(
+                  context,
+                  '/adoption-request',
+                  arguments: {
+                    'userId': userId,
+                    'bearerToken': bearerToken,
+                    'adoptableAnimals': adoptableAnimals,
+                  },
+                );
+              },
             ),
           ),
-          // Reportes button
           IconButton(
             icon: Icon(
               Icons.report_problem_outlined,
               color: AppColors.terracotta,
-              size: 28,
+              size: 32,
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/reports');
-            },
+            onPressed: () => Navigator.pushNamed(context, '/reports'),
             tooltip: 'Reportes',
           ),
-          // Perfil button
           IconButton(
             icon: Icon(
               Icons.person_outline,
               color: AppColors.deepGreen,
-              size: 30,
+              size: 34,
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/public-profile');
-            },
+            onPressed: () => Navigator.pushNamed(context, '/public-profile'),
             tooltip: 'Perfil',
           ),
         ],
