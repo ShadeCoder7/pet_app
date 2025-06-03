@@ -23,6 +23,8 @@ import 'screens/requests/adoption_request_screen.dart';
 import 'screens/requests/my_requests_screen.dart';
 import 'screens/requests/foster_home_request_screen.dart';
 import 'screens/requests/support_animal_request_screen.dart';
+import 'screens/options/password_change_screen.dart';
+import 'screens/options/notifications_screen.dart';
 
 class HopePawsApp extends StatelessWidget {
   const HopePawsApp({super.key});
@@ -42,6 +44,8 @@ class HopePawsApp extends StatelessWidget {
       '/options': (_) => const OptionsMenuScreen(),
       '/reports': (_) => const ReportsMenuScreen(),
       '/new-request': (_) => const NewRequestScreen(),
+      '/change-password': (_) => const ChangePasswordScreen(),
+      '/notifications': (_) => const NotificationsScreen(),
       // The following routes require arguments and are managed in onGenerateRoute
     };
 
