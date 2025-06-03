@@ -11,8 +11,16 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 class MainMenuScreen extends StatefulWidget {
   final String userName;
+  final String userId;
+  final String bearerToken;
 
-  const MainMenuScreen({Key? key, required this.userName}) : super(key: key);
+  // MainMenuScreen requires userName, userId, and bearerToken for correct navigation and security
+  const MainMenuScreen({
+    super.key,
+    required this.userName,
+    required this.userId,
+    required this.bearerToken,
+  });
 
   @override
   State<MainMenuScreen> createState() => _MainMenuScreenState();
@@ -28,7 +36,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     fetchAnimals();
   }
 
-  // Fetch animal list from backend
+  // Fetch animal list from backend API
   Future<void> fetchAnimals() async {
     setState(() => _isLoading = true);
     final response = await http.get(
@@ -51,7 +59,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBlueWhite, // Consistent app background
+      backgroundColor: AppColors.lightBlueWhite, // App background color
       appBar: AppBar(
         backgroundColor: AppColors.deepGreen,
         elevation: 0,
@@ -68,7 +76,11 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings_outlined, color: Colors.white, size: 28),
+            icon: Icon(
+              Icons.settings_outlined,
+              color: AppColors.terracotta,
+              size: 28,
+            ),
             onPressed: () {
               Navigator.pushNamed(context, '/options');
             },
@@ -79,7 +91,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Welcome card with icon
+          // Welcome card with icon and user name
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Container(
@@ -90,13 +102,13 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                 borderRadius: BorderRadius.circular(22),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.deepGreen.withOpacity(0.11),
+                    color: AppColors.deepGreen.withAlpha((0.11 * 255).round()),
                     blurRadius: 14,
                     offset: Offset(0, 4),
                   ),
                 ],
                 border: Border.all(
-                  color: AppColors.softGreen.withOpacity(0.35),
+                  color: AppColors.softGreen.withAlpha((0.35 * 255).round()),
                   width: 1.0,
                 ),
               ),
@@ -119,19 +131,26 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     ),
                   ),
                   const SizedBox(width: 9),
-                  Text(
-                    widget.userName,
-                    style: TextStyle(
-                      color: AppColors.deepGreen,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                      letterSpacing: 0.3,
+                  // Nombre de usuario flexible y con elipsis si es muy largo
+                  Flexible(
+                    child: Text(
+                      widget.userName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.deepGreen,
+                        fontWeight: FontWeight.bold,
+                        fontSize:
+                            20, // Puedes ajustar este valor si lo prefieres más grande/pequeño
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 6),
           ),
@@ -188,7 +207,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
               ],
             ),
           ),
-          // Animal list (with shimmer loading or empty)
+          // Animal list (loading, empty, or data)
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -216,7 +235,12 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     },
                   ),
           ),
-          _MainMenuNavigationBar(userName: widget.userName),
+          // Bottom navigation bar receives all necessary arguments for navigation
+          _MainMenuNavigationBar(
+            userName: widget.userName,
+            userId: widget.userId,
+            bearerToken: widget.bearerToken,
+          ),
         ],
       ),
     );
@@ -248,7 +272,7 @@ class _AnimalCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(21),
           boxShadow: [
             BoxShadow(
-              color: AppColors.deepGreen.withOpacity(0.13),
+              color: AppColors.deepGreen.withAlpha((0.13 * 255).round()),
               blurRadius: 16,
               offset: Offset(0, 5),
             ),
@@ -266,7 +290,9 @@ class _AnimalCard extends StatelessWidget {
                   border: Border.all(color: AppColors.softGreen, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.deepGreen.withOpacity(0.15),
+                      color: AppColors.deepGreen.withAlpha(
+                        (0.15 * 255).round(),
+                      ),
                       blurRadius: 10,
                       offset: Offset(0, 3),
                     ),
@@ -318,9 +344,17 @@ class _AnimalCard extends StatelessWidget {
   }
 }
 
+// Bottom navigation bar receives userName, userId, and bearerToken to correctly propagate them when navigating
 class _MainMenuNavigationBar extends StatelessWidget {
   final String userName;
-  const _MainMenuNavigationBar({required this.userName});
+  final String userId;
+  final String bearerToken;
+
+  const _MainMenuNavigationBar({
+    required this.userName,
+    required this.userId,
+    required this.bearerToken,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +365,7 @@ class _MainMenuNavigationBar extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withAlpha((0.15 * 255).round()),
             blurRadius: 16,
             offset: const Offset(0, -5),
           ),
@@ -355,11 +389,17 @@ class _MainMenuNavigationBar extends StatelessWidget {
               color: AppColors.deepGreen,
               size: 32,
             ),
-            onPressed: () =>
-                Navigator.pushNamed(context, '/requests', arguments: userName),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              '/requests',
+              arguments: {
+                'userName': userName,
+                'userId': userId,
+                'bearerToken': bearerToken,
+              },
+            ),
             tooltip: 'Solicitudes',
           ),
-          // Botón ADOPTAR modificado:
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -392,20 +432,22 @@ class _MainMenuNavigationBar extends StatelessWidget {
                   firebaseUid,
                 );
                 if (userApi == null) {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('No se pudo obtener tu usuario.')),
                   );
                   return;
                 }
-                final userId =
-                    userApi.userId; // Ajusta si tu modelo tiene otro campo
+                final userId = userApi
+                    .userId; // Adjust if your model uses a different field
 
-                // Step 3: Get adoptable animals (fetchRandomAnimals trae N aleatorios, puedes cambiar el número)
+                // Step 3: Get adoptable animals (fetchRandomAnimals brings N random animals, change number if needed)
                 final adoptableAnimals = await AnimalService.fetchRandomAnimals(
                   count: 20,
                 );
 
-                // Step 4: Go to adoption request screen with all required arguments
+                // Step 4: Navigate to adoption request screen with all required arguments
+                if (!context.mounted) return;
                 Navigator.pushNamed(
                   context,
                   '/adoption-request',
