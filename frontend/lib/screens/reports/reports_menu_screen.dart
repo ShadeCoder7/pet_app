@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 
 class ReportsMenuScreen extends StatelessWidget {
-  const ReportsMenuScreen({Key? key}) : super(key: key);
+  const ReportsMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
