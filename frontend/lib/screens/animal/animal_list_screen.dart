@@ -9,29 +9,15 @@ import 'animal_profile_screen.dart';
 Map<String, dynamic> getStatusStyle(String? status) {
   switch (status) {
     case 'available':
-      return {
-        'label': 'Disponible',
-        'color': AppColors.deepGreen, // Verde (defínelo en tu app_colors.dart)
-      };
+      return {'label': 'Disponible', 'color': AppColors.deepGreen};
     case 'not_available':
-      return {'label': 'No disponible', 'color': Colors.red}; // Rojo
+      return {'label': 'No disponible', 'color': Colors.redAccent};
     case 'adopted':
-      return {
-        'label': 'Adoptado',
-        'color':
-            Colors.blue, // Puedes personalizar el color si tienes uno especial
-      };
+      return {'label': 'Adoptado', 'color': Colors.blueAccent};
     case 'fostered':
-      return {
-        'label': 'En acogida',
-        'color':
-            AppColors.terracotta, // Puedes poner un naranja suave de tu paleta
-      };
+      return {'label': 'En acogida', 'color': AppColors.terracotta};
     case 'in_shelter':
-      return {
-        'label': 'En refugio',
-        'color': AppColors.softGreen, // Un verde oscuro, o el que tú quieras
-      };
+      return {'label': 'En refugio', 'color': AppColors.deepGreen};
     default:
       return {'label': 'Desconocido', 'color': Colors.grey};
   }
@@ -39,13 +25,13 @@ Map<String, dynamic> getStatusStyle(String? status) {
 
 class AnimalListScreen extends StatefulWidget {
   final String userName;
-  const AnimalListScreen({Key? key, required this.userName}) : super(key: key);
+  const AnimalListScreen({super.key, required this.userName});
 
   @override
-  _AnimalListScreenState createState() => _AnimalListScreenState();
+  AnimalListScreenState createState() => AnimalListScreenState();
 }
 
-class _AnimalListScreenState extends State<AnimalListScreen> {
+class AnimalListScreenState extends State<AnimalListScreen> {
   List<Animal> animals = [];
   bool isLoading = false;
 
@@ -133,7 +119,6 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Nombre en verde, grande y negrita
                     Text(
                       animal.animalName,
                       style: const TextStyle(
@@ -143,7 +128,6 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    // Raza y edad en terracota, negrita (igual que main_menu_screen)
                     Row(
                       children: [
                         Text(
@@ -243,7 +227,7 @@ class _AnimalListScreenState extends State<AnimalListScreen> {
 // Bottom navigation bar (same style as main menu)
 class AnimalListNavigationBar extends StatelessWidget {
   final String userName;
-  const AnimalListNavigationBar({required this.userName});
+  const AnimalListNavigationBar({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +238,7 @@ class AnimalListNavigationBar extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withAlpha((0.15 * 255).round()),
             blurRadius: 16,
             offset: const Offset(0, -5),
           ),
