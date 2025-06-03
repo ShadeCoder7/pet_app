@@ -31,17 +31,17 @@ class AdoptionRequest {
   // Clone with a new animalName (for async fetching)
   AdoptionRequest copyWith({String? animalName}) {
     return AdoptionRequest(
-      adoptionRequestId: this.adoptionRequestId,
-      requestDate: this.requestDate,
-      requestUpdateDate: this.requestUpdateDate,
-      requestStatus: this.requestStatus,
-      requestMessage: this.requestMessage,
-      requestResponse: this.requestResponse,
-      requestResponseDate: this.requestResponseDate,
-      requestIsVerified: this.requestIsVerified,
-      requestIsCompleted: this.requestIsCompleted,
-      userId: this.userId,
-      animalId: this.animalId,
+      adoptionRequestId: adoptionRequestId,
+      requestDate: requestDate,
+      requestUpdateDate: requestUpdateDate,
+      requestStatus: requestStatus,
+      requestMessage: requestMessage,
+      requestResponse: requestResponse,
+      requestResponseDate: requestResponseDate,
+      requestIsVerified: requestIsVerified,
+      requestIsCompleted: requestIsCompleted,
+      userId: userId,
+      animalId: animalId,
       animalName: animalName ?? this.animalName,
     );
   }

@@ -21,13 +21,15 @@ import 'screens/requests/requests_menu_screen.dart';
 import 'screens/requests/new_request_screen.dart';
 import 'screens/requests/adoption_request_screen.dart';
 import 'screens/requests/my_requests_screen.dart';
+import 'screens/requests/foster_home_request_screen.dart';
+import 'screens/requests/support_animal_request_screen.dart';
 
 class HopePawsApp extends StatelessWidget {
   const HopePawsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Map of routes that do NOT require custom arguments
+    // Map of static routes (do not require arguments)
     final Map<String, WidgetBuilder> routes = {
       '/onboarding': (_) => const OnboardingScreen(),
       '/login': (_) => const LoginScreen(),
@@ -39,7 +41,8 @@ class HopePawsApp extends StatelessWidget {
       '/public-profile': (_) => const PublicProfileScreen(),
       '/options': (_) => const OptionsMenuScreen(),
       '/reports': (_) => const ReportsMenuScreen(),
-      // Request screens with arguments are handled in onGenerateRoute
+      '/new-request': (_) => const NewRequestScreen(),
+      // The following routes require arguments and are managed in onGenerateRoute
     };
 
     return MaterialApp(
@@ -51,16 +54,24 @@ class HopePawsApp extends StatelessWidget {
         final String? routeName = settings.name;
         WidgetBuilder? builder;
 
-        // Main menu requires userName argument (String)
+        // Main menu (needs userName, userId, bearerToken)
         if (routeName == '/main') {
           final args = settings.arguments;
-          if (args is String) {
-            builder = (_) => MainMenuScreen(userName: args);
+          if (args is Map &&
+              args['userName'] != null &&
+              args['userId'] != null &&
+              args['bearerToken'] != null) {
+            builder = (_) => MainMenuScreen(
+              userName: args['userName'],
+              userId: args['userId'],
+              bearerToken: args['bearerToken'],
+            );
           } else {
-            builder = (_) => _errorScreen('No username provided.');
+            builder = (_) =>
+                _errorScreen('Faltan argumentos para el menú principal.');
           }
         }
-        // Animal list requires userName argument (String)
+        // Animal list (needs userName)
         else if (routeName == '/animal-list') {
           final args = settings.arguments;
           if (args is String) {
@@ -69,7 +80,7 @@ class HopePawsApp extends StatelessWidget {
             builder = (_) => _errorScreen('No username provided.');
           }
         }
-        // Animal profile requires Animal object argument
+        // Animal profile (needs Animal object)
         else if (routeName == '/animal-profile') {
           final args = settings.arguments;
           if (args is model_animal.Animal) {
@@ -78,16 +89,24 @@ class HopePawsApp extends StatelessWidget {
             builder = (_) => _errorScreen('No animal provided for profile.');
           }
         }
-        // Requests menu requires userName argument (String)
+        // Requests menu (needs userId, bearerToken, userName)
         else if (routeName == '/requests') {
           final args = settings.arguments;
-          if (args is String) {
-            builder = (_) => RequestsMenuScreen(userName: args);
+          if (args is Map &&
+              args['userId'] != null &&
+              args['bearerToken'] != null &&
+              args['userName'] != null) {
+            builder = (_) => RequestsMenuScreen(
+              userId: args['userId'],
+              bearerToken: args['bearerToken'],
+              userName: args['userName'],
+            );
           } else {
-            builder = (_) => _errorScreen('No username provided.');
+            builder = (_) =>
+                _errorScreen('Missing arguments for requests menu.');
           }
         }
-        // Search animal screen requires userName argument (String)
+        // Search animal screen (needs userName)
         else if (routeName == '/search-animal') {
           final args = settings.arguments;
           if (args is String) {
@@ -96,11 +115,7 @@ class HopePawsApp extends StatelessWidget {
             builder = (_) => _errorScreen('No username provided.');
           }
         }
-        // New request screen does NOT require arguments
-        else if (routeName == '/new-request') {
-          builder = (_) => const NewRequestScreen();
-        }
-        // Adoption request creation screen - requires userId, bearerToken, adoptableAnimals
+        // Adoption request (needs userId, bearerToken, adoptableAnimals)
         else if (routeName == '/adoption-request') {
           final args = settings.arguments;
           if (args is Map &&
@@ -117,7 +132,7 @@ class HopePawsApp extends StatelessWidget {
                 _errorScreen('Missing arguments for adoption request.');
           }
         }
-        // My requests screen - requires userId, bearerToken
+        // My requests screen (needs userId, bearerToken)
         else if (routeName == '/my-requests') {
           final args = settings.arguments;
           if (args is Map &&
@@ -130,6 +145,28 @@ class HopePawsApp extends StatelessWidget {
           } else {
             builder = (_) =>
                 _errorScreen('Missing arguments for viewing requests.');
+          }
+        }
+        // Foster Home Request screen (needs userId if you want to relate to user)
+        else if (routeName == '/foster-request') {
+          final args = settings.arguments;
+          if (args is Map && args['userId'] != null) {
+            builder = (_) => FosterHomeRequestScreen(userId: args['userId']);
+          } else {
+            builder = (_) => const FosterHomeRequestScreen();
+          }
+        }
+        // Support Animal Request screen (needs adoptableAnimals, optionally userId)
+        else if (routeName == '/sponsor-request') {
+          final args = settings.arguments;
+          if (args is Map && args['adoptableAnimals'] != null) {
+            builder = (_) => SupportAnimalRequestScreen(
+              userId: args['userId'],
+              adoptableAnimals: args['adoptableAnimals'],
+            );
+          } else {
+            builder = (_) =>
+                _errorScreen('Missing animals for sponsor request.');
           }
         }
         // All other static routes (from the routes map)
