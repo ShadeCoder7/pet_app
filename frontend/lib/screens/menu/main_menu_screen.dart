@@ -131,7 +131,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     ),
                   ),
                   const SizedBox(width: 9),
-                  // Nombre de usuario flexible y con elipsis si es muy largo
+                  // Flexible user name with ellipsis if too long
                   Flexible(
                     child: Text(
                       widget.userName,
@@ -141,7 +141,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                         color: AppColors.deepGreen,
                         fontWeight: FontWeight.bold,
                         fontSize:
-                            20, // Puedes ajustar este valor si lo prefieres más grande/pequeño
+                            20, // You can adjust this value if you prefer it larger/smaller
                         letterSpacing: 0.3,
                       ),
                     ),
