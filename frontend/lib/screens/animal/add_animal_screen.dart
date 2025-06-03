@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 
 class AddAnimalScreen extends StatelessWidget {
-  const AddAnimalScreen({Key? key}) : super(key: key);
+  const AddAnimalScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
