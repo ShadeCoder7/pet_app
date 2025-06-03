@@ -8,15 +8,80 @@ class AnimalProfileScreen extends StatelessWidget {
 
   const AnimalProfileScreen({Key? key, required this.animal}) : super(key: key);
 
+  String _translateValue(String key, Map<String, String> translations) {
+    return translations[key.toLowerCase()] ?? key;
+  }
+
+  Widget _buildInfoBox(IconData icon, String label, String? value) {
+    if (value == null || value.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.07),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: AppColors.deepGreen.withOpacity(0.2),
+          width: 1.1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.terracotta, size: 26),
+          const SizedBox(width: 20),
+          Text(
+            '$label:',
+            style: TextStyle(
+              color: AppColors.deepGreen,
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(color: AppColors.deepGreen, fontSize: 18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Find main image or first one
     AnimalImage? mainImage = animal.images.isNotEmpty
-        ? (animal.images.firstWhere(
+        ? animal.images.firstWhere(
             (img) => img.isMainImage,
             orElse: () => animal.images[0],
-          ))
+          )
         : null;
+
+    final statusTranslations = {
+      'available': 'Disponible',
+      'adopted': 'Adoptado',
+      'pending': 'Pendiente',
+      'not_available': 'No disponible',
+      'fostered': 'En acogida',
+      'in_shelter': 'En refugio',
+    };
+
+    final typeTranslations = {'dog': 'Perro', 'cat': 'Gato', 'other': 'Otro'};
+
+    final sizeTranslations = {
+      'small': 'Pequeño',
+      'medium': 'Mediano',
+      'large': 'Grande',
+    };
 
     return Scaffold(
       backgroundColor: AppColors.lightBlueWhite,
@@ -35,78 +100,76 @@ class AnimalProfileScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Animal Image
-                Center(
-                  child: mainImage != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(18),
-                          child: Image.network(
-                            mainImage.imageUrl,
-                            height: 200,
-                            width: 200,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : Icon(
-                          Icons.pets,
-                          color: AppColors.terracotta,
-                          size: 120,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: mainImage != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Image.network(
+                          mainImage.imageUrl,
+                          height: 200,
+                          width: 200,
+                          fit: BoxFit.cover,
                         ),
+                      )
+                    : Icon(Icons.pets, color: AppColors.terracotta, size: 120),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                animal.animalName,
+                style: TextStyle(
+                  color: AppColors.deepGreen,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 22),
-
-                // Animal Name
-                Text(
-                  animal.animalName,
-                  style: TextStyle(
-                    color: AppColors.deepGreen,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              _buildInfoBox(Icons.pets, 'Raza', animal.animalBreed),
+              _buildInfoBox(
+                Icons.cake_outlined,
+                'Edad',
+                animal.animalAge != null ? '${animal.animalAge} años' : null,
+              ),
+              _buildInfoBox(
+                Icons.pets_outlined,
+                'Tipo',
+                _translateValue(
+                  animal.animalTypeKey.toLowerCase(),
+                  typeTranslations,
                 ),
-                const SizedBox(height: 8),
-
-                // Breed, age, and status
-                Text(
-                  '${animal.animalBreed} | ${animal.animalAge ?? "-"} años',
-                  style: TextStyle(
-                    color: AppColors.terracotta,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+              ),
+              _buildInfoBox(
+                Icons.straighten,
+                'Tamaño',
+                _translateValue(
+                  animal.animalSizeKey.toLowerCase(),
+                  sizeTranslations,
                 ),
-                const SizedBox(height: 6),
-
-                Text(
-                  'Estado: ${animal.animalStatus}',
-                  style: TextStyle(color: AppColors.deepGreen, fontSize: 16),
+              ),
+              _buildInfoBox(
+                Icons.location_on_outlined,
+                'Ubicación',
+                animal.animalLocation,
+              ),
+              _buildInfoBox(
+                Icons.description_outlined,
+                'Descripción',
+                animal.animalDescription,
+              ),
+              _buildInfoBox(
+                Icons.info_outline,
+                'Estado',
+                _translateValue(
+                  animal.animalStatus.toLowerCase(),
+                  statusTranslations,
                 ),
-                const SizedBox(height: 14),
-
-                // Description
-                Text(
-                  'Descripción',
-                  style: TextStyle(
-                    color: AppColors.deepGreen,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  animal.animalDescription,
-                  style: TextStyle(color: AppColors.deepGreen, fontSize: 16),
-                ),
-                const SizedBox(height: 20),
-                // Aquí puedes añadir más campos (ubicación, tipo, etc.)
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
