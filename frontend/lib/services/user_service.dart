@@ -31,7 +31,6 @@ class UserService {
       final Map<String, dynamic> jsonData = json.decode(response.body);
       return app_user.User.fromJson(jsonData);
     } else {
-      // Could handle 404, 401, etc. here if needed
       return null;
     }
   }
@@ -58,6 +57,31 @@ class UserService {
       return app_user.User.fromJson(jsonData);
     } else {
       return null;
+    }
+  }
+
+  // Updates user profile with PATCH (partial update).
+  static Future<void> patchUserProfile(
+    String userId,
+    Map<String, dynamic> updates,
+    String bearerToken,
+  ) async {
+    final Uri url = Uri.parse('$baseUrl/$userId');
+    final response = await http.patch(
+      url,
+      headers: {
+        'Authorization': 'Bearer $bearerToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(updates),
+    );
+
+    if (response.statusCode == 204 || response.statusCode == 200) {
+      // Update successful, nothing more to do
+      return;
+    } else {
+      // Handle errors
+      throw Exception('Error al actualizar el perfil: ${response.body}');
     }
   }
 }
