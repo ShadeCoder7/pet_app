@@ -27,13 +27,14 @@ import 'screens/requests/support_animal_request_screen.dart';
 import 'screens/options/password_change_screen.dart';
 import 'screens/options/notifications_screen.dart';
 import 'screens/requests/specific_request_screen.dart';
+import 'screens/user/edit_profile_screen.dart';
 
 class HopePawsApp extends StatelessWidget {
   const HopePawsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Static routes (do not require arguments)
+    // Static routes (no arguments needed)
     final Map<String, WidgetBuilder> routes = {
       '/onboarding': (_) => const OnboardingScreen(),
       '/login': (_) => const LoginScreen(),
@@ -48,14 +49,13 @@ class HopePawsApp extends StatelessWidget {
       '/new-request': (_) => const NewRequestScreen(),
       '/change-password': (_) => const ChangePasswordScreen(),
       '/notifications': (_) => const NotificationsScreen(),
-      // The following routes require arguments and are managed in onGenerateRoute
+      // Dynamic routes handled below
     };
 
     return MaterialApp(
       title: 'Hope&Paws',
       debugShowCheckedModeBanner: false,
       initialRoute: '/onboarding',
-      // onGenerateRoute handles all screens that require custom arguments
       onGenerateRoute: (RouteSettings settings) {
         final String? routeName = settings.name;
         WidgetBuilder? builder;
@@ -199,7 +199,23 @@ class HopePawsApp extends StatelessWidget {
                 _errorScreen('Missing animals for sponsor request.');
           }
         }
-        // All other static routes (from the routes map)
+        // Edit profile screen (needs User object, userId, bearerToken)
+        else if (routeName == '/edit-profile') {
+          final args = settings.arguments;
+          if (args is Map &&
+              args['user'] != null &&
+              args['userId'] != null &&
+              args['bearerToken'] != null) {
+            builder = (_) => EditProfileScreen(
+              user: args['user'],
+              userId: args['userId'],
+              bearerToken: args['bearerToken'],
+            );
+          } else {
+            builder = (_) => _errorScreen('No user data provided for editing.');
+          }
+        }
+        // All other static routes
         else {
           builder = routes[routeName];
         }
