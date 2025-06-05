@@ -59,7 +59,7 @@ The architecture is modular and scalable, separating all core responsibilities:
 - **Frontend:**  
   Flutter mobile app, handles all UI, navigation, user actions, API calls (HTTP/REST, JWT Bearer).
 - **Backend:**  
-  ASP.NET Core API, with a clean separation of Models, DTOs, Services, and Controllers.  
+  ASP.NET Core API, with a clean separation of Models, DTOs, Interfaces, Services, and Controllers.  
   Security through JWT validation from Firebase.
 - **Database:**  
   PostgreSQL, fully normalized and deployed in Docker.  
