@@ -25,7 +25,15 @@ Map<String, dynamic> getStatusStyle(String? status) {
 
 class SearchAnimalScreen extends StatefulWidget {
   final String userName;
-  const SearchAnimalScreen({super.key, required this.userName});
+  final String userId;
+  final String bearerToken;
+
+  const SearchAnimalScreen({
+    super.key,
+    required this.userName,
+    required this.userId,
+    required this.bearerToken,
+  });
 
   @override
   State<SearchAnimalScreen> createState() => _SearchAnimalScreenState();
@@ -287,7 +295,11 @@ class _SearchAnimalScreenState extends State<SearchAnimalScreen> {
         ),
       ),
       // Botonera igual que el resto
-      bottomNavigationBar: AnimalListNavigationBar(userName: widget.userName),
+      bottomNavigationBar: AnimalListNavigationBar(
+        userName: widget.userName,
+        userId: widget.userId,
+        bearerToken: widget.bearerToken,
+      ),
     );
   }
 }
@@ -295,7 +307,14 @@ class _SearchAnimalScreenState extends State<SearchAnimalScreen> {
 // Puedes reutilizar la misma botonera homogénea aquí, importándola o copiando el widget
 class AnimalListNavigationBar extends StatelessWidget {
   final String userName;
-  const AnimalListNavigationBar({super.key, required this.userName});
+  final String userId;
+  final String bearerToken;
+  const AnimalListNavigationBar({
+    super.key,
+    required this.userName,
+    required this.userId,
+    required this.bearerToken,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -322,7 +341,15 @@ class AnimalListNavigationBar extends StatelessWidget {
               size: 32,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/main', arguments: userName);
+              Navigator.pushNamed(
+                context,
+                '/main',
+                arguments: {
+                  'userName': userName,
+                  'userId': userId,
+                  'bearerToken': bearerToken,
+                },
+              );
             },
             tooltip: 'Inicio',
           ),
@@ -356,7 +383,11 @@ class AnimalListNavigationBar extends StatelessWidget {
               size: 32,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/requests', arguments: userName);
+              Navigator.pushNamed(
+                context,
+                '/requests',
+                arguments: {userName, userId, bearerToken},
+              );
             },
             tooltip: 'Solicitudes',
           ),
