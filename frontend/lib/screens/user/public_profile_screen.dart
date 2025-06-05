@@ -22,6 +22,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     _loadUserProfile();
   }
 
+  // Loads the current user's profile from the backend
   Future<void> _loadUserProfile() async {
     try {
       final fbUser = fb_auth.FirebaseAuth.instance.currentUser;
@@ -45,6 +46,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     }
   }
 
+  // Builds a styled info row with icon, label, and value (for each user field)
   Widget _buildInfoBox(IconData icon, String label, String? value) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
 
@@ -90,6 +92,41 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
+  // Navigates to the Edit Profile screen, passing all necessary arguments
+  Future<void> _goToEditProfile() async {
+    if (_user == null) return;
+
+    // Get the user's bearer token from Firebase Auth (for secure API access)
+    final fbUser = fb_auth.FirebaseAuth.instance.currentUser;
+    final String? bearerToken = await fbUser?.getIdToken();
+
+    if (bearerToken == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo autenticar al usuario.')),
+      );
+      return;
+    }
+
+    // Navigate to EditProfileScreen, passing the user, userId and bearerToken
+    if (!mounted) return;
+    final result = await Navigator.pushNamed(
+      context,
+      '/edit-profile',
+      arguments: {
+        'user': _user!,
+        'userId': _user!.userId,
+        'bearerToken': bearerToken,
+      },
+    );
+    if (!mounted) return;
+
+    // If profile was successfully updated, reload the profile data
+    if (result == true) {
+      _loadUserProfile();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,7 +144,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
         ),
       ),
       body: _isLoading
+          // Show loading spinner while loading
           ? const Center(child: CircularProgressIndicator())
+          // Show error if occurred
           : _error != null
           ? Center(
               child: Text(
@@ -115,6 +154,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                 style: TextStyle(color: AppColors.terracotta, fontSize: 18),
               ),
             )
+          // If user data is missing, show info
           : _user == null
           ? Center(
               child: Text(
@@ -122,11 +162,13 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                 style: TextStyle(color: AppColors.terracotta, fontSize: 18),
               ),
             )
+          // Main profile UI
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Profile photo and name
                   Row(
                     children: [
                       CircleAvatar(
@@ -171,6 +213,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 30),
+                  // Info boxes for each field
                   _buildInfoBox(
                     Icons.email_outlined,
                     'Email',
@@ -194,13 +237,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                     )[0],
                   ),
                   const SizedBox(height: 30),
-                  // Optional: button to edit profile
+                  // Edit profile button
                   Center(
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        // Navigate to edit profile screen (if implemented)
-                        // Navigator.pushNamed(context, '/edit-profile');
-                      },
+                      onPressed: _goToEditProfile,
                       icon: const Icon(Icons.edit, color: AppColors.terracotta),
                       label: const Text(
                         'Editar perfil',
@@ -218,12 +258,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        // Optional: you can remove textStyle here or keep it without color to avoid conflict
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
-                        // foregroundColor: AppColors.terracotta, // alternative way to set icon & text color
                       ),
                     ),
                   ),
