@@ -5,6 +5,7 @@ import '../../utils/app_colors.dart';
 class OptionsMenuScreen extends StatelessWidget {
   const OptionsMenuScreen({super.key});
 
+  // Show about dialog
   void _showAboutDialog(BuildContext context) {
     showAboutDialog(
       context: context,
@@ -27,6 +28,7 @@ class OptionsMenuScreen extends StatelessWidget {
     );
   }
 
+  // Build a menu item with icon and label
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
@@ -81,7 +83,7 @@ class OptionsMenuScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              // Main menu container
+              // Main options container
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -100,14 +102,69 @@ class OptionsMenuScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    // Notifications settings
                     _buildMenuItem(
                       context,
-                      icon: Icons.person,
-                      label: 'Editar perfil',
+                      icon: Icons.notifications,
+                      label: 'Notificaciones',
                       onTap: () =>
-                          Navigator.pushNamed(context, '/public-profile'),
+                          Navigator.pushNamed(context, '/notifications'),
                     ),
                     const Divider(height: 1, indent: 24, endIndent: 24),
+
+                    // Language settings
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.language,
+                      label: 'Idioma',
+                      onTap: () {
+                        // Show a bottom sheet to change language
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (_) => Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text('Selecciona el idioma'),
+                                const SizedBox(height: 16),
+                                ListTile(
+                                  leading: const Icon(Icons.language),
+                                  title: const Text('Español'),
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'El idioma se cambiará en una próxima versión.',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.language),
+                                  title: const Text('English'),
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Language will be available soon.',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1, indent: 24, endIndent: 24),
+
+                    // Change password
                     _buildMenuItem(
                       context,
                       icon: Icons.lock_reset,
@@ -116,15 +173,8 @@ class OptionsMenuScreen extends StatelessWidget {
                           Navigator.pushNamed(context, '/change-password'),
                     ),
                     const Divider(height: 1, indent: 24, endIndent: 24),
-                    _buildMenuItem(
-                      context,
-                      icon: Icons.notifications,
-                      label: 'Notificaciones',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/notifications');
-                      },
-                    ),
-                    const Divider(height: 1, indent: 24, endIndent: 24),
+
+                    // About app
                     _buildMenuItem(
                       context,
                       icon: Icons.info_outline,
@@ -132,6 +182,8 @@ class OptionsMenuScreen extends StatelessWidget {
                       onTap: () => _showAboutDialog(context),
                     ),
                     const Divider(height: 1, indent: 24, endIndent: 24),
+
+                    // Log out option
                     _buildMenuItem(
                       context,
                       icon: Icons.logout,
@@ -177,7 +229,7 @@ class OptionsMenuScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // Delete account container separated at the bottom
+              // Delete account container
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
