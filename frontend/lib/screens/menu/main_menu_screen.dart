@@ -180,7 +180,11 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     Navigator.pushNamed(
                       context,
                       '/animal-list',
-                      arguments: widget.userName,
+                      arguments: {
+                        'userName': widget.userName,
+                        'userId': widget.userId,
+                        'bearerToken': widget.bearerToken,
+                      },
                     );
                   },
                   icon: Icon(Icons.chevron_right, color: AppColors.deepGreen),
