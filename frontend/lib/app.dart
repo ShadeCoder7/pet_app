@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../models/animal.dart' as model_animal;
+import '../../models/adoption_request.dart';
 
 // Screens imports
 import 'screens/onboarding/onboarding_screen.dart';
@@ -25,13 +26,14 @@ import 'screens/requests/foster_home_request_screen.dart';
 import 'screens/requests/support_animal_request_screen.dart';
 import 'screens/options/password_change_screen.dart';
 import 'screens/options/notifications_screen.dart';
+import 'screens/requests/specific_request_screen.dart';
 
 class HopePawsApp extends StatelessWidget {
   const HopePawsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Map of static routes (do not require arguments)
+    // Static routes (do not require arguments)
     final Map<String, WidgetBuilder> routes = {
       '/onboarding': (_) => const OnboardingScreen(),
       '/login': (_) => const LoginScreen(),
@@ -75,13 +77,20 @@ class HopePawsApp extends StatelessWidget {
                 _errorScreen('Missing arguments for the main menu.');
           }
         }
-        // Animal list (needs userName)
+        // Animal list (needs userName, userId, bearerToken)
         else if (routeName == '/animal-list') {
           final args = settings.arguments;
-          if (args is String) {
-            builder = (_) => AnimalListScreen(userName: args);
+          if (args is Map &&
+              args['userName'] != null &&
+              args['userId'] != null &&
+              args['bearerToken'] != null) {
+            builder = (_) => AnimalListScreen(
+              userName: args['userName'],
+              userId: args['userId'],
+              bearerToken: args['bearerToken'],
+            );
           } else {
-            builder = (_) => _errorScreen('No username provided.');
+            builder = (_) => _errorScreen('Missing arguments for animal list.');
           }
         }
         // Animal profile (needs Animal object)
@@ -93,24 +102,24 @@ class HopePawsApp extends StatelessWidget {
             builder = (_) => _errorScreen('No animal provided for profile.');
           }
         }
-        // Requests menu (needs userId, bearerToken, userName)
+        // Requests menu (needs userName, userId, bearerToken)
         else if (routeName == '/requests') {
           final args = settings.arguments;
           if (args is Map &&
+              args['userName'] != null &&
               args['userId'] != null &&
-              args['bearerToken'] != null &&
-              args['userName'] != null) {
+              args['bearerToken'] != null) {
             builder = (_) => RequestsMenuScreen(
+              userName: args['userName'],
               userId: args['userId'],
               bearerToken: args['bearerToken'],
-              userName: args['userName'],
             );
           } else {
             builder = (_) =>
                 _errorScreen('Missing arguments for requests menu.');
           }
         }
-        // Search animal screen (needs userName)
+        // Search animal screen (needs userName, userId, bearerToken)
         else if (routeName == '/search-animal') {
           final args = settings.arguments;
           if (args is Map &&
@@ -159,7 +168,16 @@ class HopePawsApp extends StatelessWidget {
                 _errorScreen('Missing arguments for viewing requests.');
           }
         }
-        // Foster Home Request screen (needs userId if you want to relate to user)
+        // Specific request detail screen (needs AdoptionRequest object)
+        else if (routeName == '/specific-request') {
+          final args = settings.arguments;
+          if (args is AdoptionRequest) {
+            builder = (_) => SpecificRequestScreen(request: args);
+          } else {
+            builder = (_) => _errorScreen('No request data provided.');
+          }
+        }
+        // Foster Home Request screen (needs userId)
         else if (routeName == '/foster-request') {
           final args = settings.arguments;
           if (args is Map && args['userId'] != null) {
