@@ -356,7 +356,15 @@ class AnimalListNavigationBar extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.search, color: AppColors.terracotta, size: 32),
             onPressed: () {
-              // Ya estamos en buscar, puedes dejarlo vacío o hacer pop si lo prefieres
+              Navigator.pushNamed(
+                context,
+                '/search-animal',
+                arguments: {
+                  'userName': userName,
+                  'userId': userId,
+                  'bearerToken': bearerToken,
+                },
+              );
             },
             tooltip: 'Buscar',
           ),
@@ -386,7 +394,11 @@ class AnimalListNavigationBar extends StatelessWidget {
               Navigator.pushNamed(
                 context,
                 '/requests',
-                arguments: {userName, userId, bearerToken},
+                arguments: {
+                  'userName': userName,
+                  'userId': userId,
+                  'bearerToken': bearerToken,
+                },
               );
             },
             tooltip: 'Solicitudes',
@@ -394,7 +406,7 @@ class AnimalListNavigationBar extends StatelessWidget {
           IconButton(
             icon: Icon(
               Icons.person_outline,
-              color: AppColors.terracotta,
+              color: AppColors.deepGreen,
               size: 34,
             ),
             onPressed: () {
