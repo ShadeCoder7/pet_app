@@ -72,7 +72,7 @@ class HopePawsApp extends StatelessWidget {
             );
           } else {
             builder = (_) =>
-                _errorScreen('Faltan argumentos para el menú principal.');
+                _errorScreen('Missing arguments for the main menu.');
           }
         }
         // Animal list (needs userName)
@@ -113,10 +113,18 @@ class HopePawsApp extends StatelessWidget {
         // Search animal screen (needs userName)
         else if (routeName == '/search-animal') {
           final args = settings.arguments;
-          if (args is String) {
-            builder = (_) => SearchAnimalScreen(userName: args);
+          if (args is Map &&
+              args['userName'] != null &&
+              args['userId'] != null &&
+              args['bearerToken'] != null) {
+            builder = (_) => SearchAnimalScreen(
+              userName: args['userName'],
+              userId: args['userId'],
+              bearerToken: args['bearerToken'],
+            );
           } else {
-            builder = (_) => _errorScreen('No username provided.');
+            builder = (_) =>
+                _errorScreen('Missing arguments for search animal.');
           }
         }
         // Adoption request (needs userId, bearerToken, adoptableAnimals)
