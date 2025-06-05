@@ -79,7 +79,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
             icon: Icon(
               Icons.settings_outlined,
               color: AppColors.terracotta,
-              size: 28,
+              size: 30,
             ),
             onPressed: () {
               Navigator.pushNamed(context, '/options');
