@@ -126,8 +126,10 @@ class _RequestsMenuScreenState extends State<RequestsMenuScreen> {
                       Navigator.pushNamed(
                         context,
                         '/new-request',
-                        // If /new-request needs arguments, pass them here
-                        // arguments: {...}
+                        arguments: {
+                          'userId': widget.userId,
+                          'bearerToken': widget.bearerToken,
+                        },
                       );
                     },
                     scale: _scaleNewRequest,
@@ -233,7 +235,11 @@ class RequestsMenuBottomNavBar extends StatelessWidget {
               Navigator.pushNamed(
                 context,
                 '/search-animal',
-                arguments: userName,
+                arguments: {
+                  'userName': userName,
+                  'userId': userId,
+                  'bearerToken': bearerToken,
+                },
               );
             },
             tooltip: 'Buscar',
