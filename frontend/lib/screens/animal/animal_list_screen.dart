@@ -25,7 +25,14 @@ Map<String, dynamic> getStatusStyle(String? status) {
 
 class AnimalListScreen extends StatefulWidget {
   final String userName;
-  const AnimalListScreen({super.key, required this.userName});
+  final String userId;
+  final String bearerToken;
+  const AnimalListScreen({
+    super.key,
+    required this.userName,
+    required this.userId,
+    required this.bearerToken,
+  });
 
   @override
   AnimalListScreenState createState() => AnimalListScreenState();
@@ -219,7 +226,11 @@ class AnimalListScreenState extends State<AnimalListScreen> {
               ),
       ),
       // Navigation bar with the same style as other screens
-      bottomNavigationBar: AnimalListNavigationBar(userName: widget.userName),
+      bottomNavigationBar: AnimalListNavigationBar(
+        userName: widget.userName,
+        userId: widget.userId,
+        bearerToken: widget.bearerToken,
+      ),
     );
   }
 }
@@ -227,7 +238,15 @@ class AnimalListScreenState extends State<AnimalListScreen> {
 // Bottom navigation bar (same style as main menu)
 class AnimalListNavigationBar extends StatelessWidget {
   final String userName;
-  const AnimalListNavigationBar({super.key, required this.userName});
+  final String userId;
+  final String bearerToken;
+
+  const AnimalListNavigationBar({
+    super.key,
+    required this.userName,
+    required this.userId,
+    required this.bearerToken,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +285,11 @@ class AnimalListNavigationBar extends StatelessWidget {
               Navigator.pushNamed(
                 context,
                 '/search-animal',
-                arguments: userName,
+                arguments: {
+                  'userName': userName,
+                  'userId': userId,
+                  'bearerToken': bearerToken,
+                },
               );
             },
             tooltip: 'Buscar',
