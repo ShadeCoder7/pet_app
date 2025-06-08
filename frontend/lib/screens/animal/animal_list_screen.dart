@@ -274,7 +274,15 @@ class AnimalListNavigationBar extends StatelessWidget {
               size: 32,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/main', arguments: userName);
+              Navigator.pushNamed(
+                context,
+                '/main',
+                arguments: {
+                  'userName': userName,
+                  'userId': userId,
+                  'bearerToken': bearerToken,
+                },
+              );
             },
             tooltip: 'Inicio',
           ),
@@ -319,7 +327,15 @@ class AnimalListNavigationBar extends StatelessWidget {
               size: 32,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/requests', arguments: userName);
+              Navigator.pushNamed(
+                context,
+                '/requests',
+                arguments: {
+                  'userName': userName,
+                  'userId': userId,
+                  'bearerToken': bearerToken,
+                },
+              );
             },
             tooltip: 'Solicitudes',
           ),
